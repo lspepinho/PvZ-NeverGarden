@@ -99,7 +99,7 @@ public:
     virtual void                ButtonPress(int theId);
     /*inline*/ bool             IsPageShown(StorePages thePage);
     virtual void                ButtonDepress(int theId);
-    virtual void                KeyChar(char theChar);
+    virtual void                KeyDown(KeyCode theKey);
     static /*inline*/ int		GetItemCost(StoreItem theStoreItem);
     /*inline*/ bool             CanAffordItem(StoreItem theStoreItem);
     void                        PurchaseItem(StoreItem theStoreItem);

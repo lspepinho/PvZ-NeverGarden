@@ -102,6 +102,7 @@ public:
 	GameOverDialog(const std::string& theMessage, bool theShowChallengeName);
 	virtual ~GameOverDialog();
 
+	virtual void			KeyDown(KeyCode theKey);
 	virtual void			ButtonDepress(int theId);
 	virtual void			AddedToManager(WidgetManager* theWidgetManager);
 	virtual void			RemovedFromManager(WidgetManager* theWidgetManager);

@@ -74,7 +74,7 @@ public:
 	virtual void		Update();
 	virtual void		AddedToManager(WidgetManager* theWidgetManager) { Widget::AddedToManager(theWidgetManager); }
 	virtual void		RemovedFromManager(WidgetManager* theWidgetManager) { Widget::RemovedFromManager(theWidgetManager); }
-	virtual void		KeyChar(char theChar);
+	virtual void		KeyDown(KeyCode theKey);
 	void				StartButtonPressed();
 	virtual void		MouseDown(int x, int y, int theClickCount);
 	virtual void		MouseUp(int x, int y, int theClickCount);

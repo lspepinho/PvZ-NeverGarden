@@ -45,6 +45,7 @@ public:
 	virtual void		Resize(int theX, int theY, int theWidth, int theHeight);
 	virtual void		AddedToManager(WidgetManager* theWidgetManager);
 	virtual void		RemovedFromManager(WidgetManager* theWidgetManager);
+	virtual void		KeyDown(KeyCode theKey);
 	virtual void		ButtonDepress(int theId);
 	void				RestartLoopingSounds();
 };

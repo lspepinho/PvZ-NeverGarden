@@ -478,6 +478,18 @@ GameOverDialog::~GameOverDialog()
     delete mMenuButton;
 }
 
+void GameOverDialog::KeyDown(KeyCode theKey)
+{
+    if (theKey == KeyCode::KEYCODE_ESCAPE)
+    {
+        ButtonDepress(1);
+        return;
+    }
+
+    LawnDialog::KeyDown(theKey);
+}
+
+//0x457E50
 void GameOverDialog::ButtonDepress(int theId)
 {
     if (theId == 1)

@@ -74,6 +74,7 @@ public:
     virtual void                ButtonMouseLeave(int){}
     virtual void                ButtonMouseMove(int, int, int){}
     virtual void                ButtonDepress(int theId);
+    virtual void                KeyDown(KeyCode theKey);
     void                        UpdateToolTip();
 //  virtual void                KeyChar(char theChar);
 
