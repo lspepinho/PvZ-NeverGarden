@@ -7534,7 +7534,6 @@ void Board::DrawTopRightUI(Graphics* g)
 		mStoreButton->Draw(g);
 		g->SetColorizeImages(false);
 	}
-	mUndergroundButton->Draw(g);
 }
 
 void Board::DrawUIBottom(Graphics* g)
@@ -7787,6 +7786,11 @@ void Board::DrawUITop(Graphics* g)
 	if (mStoreButton && mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_LAST_STAND)
 	{
 		mStoreButton->Draw(g);
+	}
+	
+	if (mUndergroundButton)
+	{
+		mUndergroundButton->Draw(g);
 	}
 
 	if ((mApp->mGameMode == GameMode::GAMEMODE_UPSELL || mApp->mGameMode == GameMode::GAMEMODE_INTRO) && mCutScene->mUpsellHideBoard)
