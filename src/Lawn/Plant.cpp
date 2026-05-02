@@ -2905,14 +2905,7 @@ void Plant::UpdateCenourra()
         mApp->PlayFoley(FoleyType::FOLEY_PLANTGROW);
     }
 
-    if (!mCenourraIsUpper)
-    {
-        UpdateChomper();
-    }
-    else if (mBoard->mUndergroundView)
-    {
-        UpdateChomper();
-    }
+    UpdateChomper();
 }
 
 void Plant::UpdateLampadaSaoJorge()
@@ -5717,7 +5710,8 @@ Rect Plant::GetPlantAttackRect(PlantWeapon thePlantWeapon)
     {
     case SeedType::SEED_LEFTPEATER:     aRect = Rect(0,             mY,             mX,                 mHeight);               break;
     case SeedType::SEED_SQUASH:         aRect = Rect(mX + 20,       mY,             mWidth - 35,        mHeight);               break;
-    case SeedType::SEED_CHOMPER:        aRect = Rect(mX + 80,       mY,             40,                 mHeight);               break;
+    case SeedType::SEED_CHOMPER:
+    case SeedType::SEED_CENOURRA:       aRect = Rect(mX + 80,       mY,             40,                 mHeight);               break;
     case SeedType::SEED_SPIKEWEED:
     case SeedType::SEED_SPIKEROCK:      aRect = Rect(mX + 20,       mY,             mWidth - 50,        mHeight);               break;
     case SeedType::SEED_POTATOMINE:     aRect = Rect(mX,            mY,             mWidth - 25,        mHeight);               break;

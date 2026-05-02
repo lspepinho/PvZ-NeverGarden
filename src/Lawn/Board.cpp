@@ -7873,18 +7873,6 @@ void Board::ButtonDepress(int theId)
 	{
 		mApp->EndLevel();
 	}
-	else if (theId == 10)
-	{
-		mUndergroundView = !mUndergroundView;
-		if (mUndergroundView)
-		{
-			mUndergroundButton->SetLabel("Underground");
-		}
-		else
-		{
-			mUndergroundButton->SetLabel("Surface");
-		}
-	}
 }
 
 // GOTY @Patoke: 0x41D910
