@@ -4917,19 +4917,6 @@ void Board::MouseUp(int x, int y, int theClickCount)
 				mApp->DoBackToMain();
 			}
 		}
-		else if (mUndergroundButton->IsMouseOver())
-		{
-			mUndergroundView = !mUndergroundView;
-			if (mUndergroundView)
-			{
-				mUndergroundButton->SetLabel("Underground");
-			}
-			else
-			{
-				mUndergroundButton->SetLabel("Surface");
-			}
-			mApp->PlaySample(Sexy::SOUND_GRAVEBUTTON);
-		}
 	}
 }
 
