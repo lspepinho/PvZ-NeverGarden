@@ -293,7 +293,11 @@ void SeedChooserScreen::GetSeedPositionInChooser(int theIndex, int& x, int& y)
 		int aCol = theIndex % 8;
 
 		x = aCol * 53 + 22;
-		if (Has7Rows())
+		if (NUM_SEEDS_IN_CHOOSER > 48)
+		{
+			y = aRow * 50 + 123;
+		}
+		else if (Has7Rows())
 		{
 			y = aRow * 70 + 123;
 		}
@@ -358,7 +362,7 @@ void SeedChooserScreen::Draw(Graphics* g)
 	// @Patoke: wrong local name
 	TodDrawString(g, "[CHOOSE_YOUR_PLANTS]", 229, 110, Sexy::FONT_DWARVENTODCRAFT18YELLOW, Color::White, DS_ALIGN_CENTER);
 
-	int aNumSeeds = Has7Rows() ? 48 : 40;
+	int aNumSeeds = NUM_SEEDS_IN_CHOOSER;
 	for (SeedType aSeedShadow = SEED_PEASHOOTER; aSeedShadow < aNumSeeds; aSeedShadow = (SeedType)(aSeedShadow + 1))
 	{
 		int x, y;

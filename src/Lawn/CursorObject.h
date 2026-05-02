@@ -36,6 +36,8 @@ public:
 	PlantID					mGlovePlantID;
 	PlantID					mDuplicatorPlantID;
 	PlantID					mCobCannonPlantID;
+    PlantID                 mAbacaspinhoID;
+    PlantID                 mMortarlanciaID;
 	int32_t					mHammerDownCounter;
 	ReanimationID			mReanimCursorID;
 

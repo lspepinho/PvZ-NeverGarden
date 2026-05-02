@@ -247,6 +247,8 @@ public:
 	uint32_t						mDiamondsCollected;										//+GOTY @Patoke: 0x57CC
 	uint32_t						mPottedPlantsCollected;
 	uint32_t						mChocolateCollected;
+	bool							mUndergroundView;
+	GameButton*						mUndergroundButton;
 
 public:
 	Board(LawnApp* theApp);
@@ -289,7 +291,7 @@ public:
 	virtual void					Draw(Graphics* g);
 	void							DrawBackdrop(Graphics* g);
 	virtual void					ButtonPress  	(int){}
-	virtual void					ButtonDepress	(int){}
+	virtual void					ButtonDepress	(int theId);
 	virtual void					ButtonDownTick	(int){}
 	virtual void					ButtonMouseEnter(int){}
 	virtual void					ButtonMouseLeave(int){}
@@ -423,8 +425,14 @@ public:
 	bool							HasValidCobCannonSpot();
 	bool							IsValidCobCannonSpot(int theGridX, int theGridY);
 	bool							IsValidCobCannonSpotHelper(int theGridX, int theGridY);
+	bool							IsValidMortarlanciaSpot(int theGridX, int theGridY);
+	bool							IsValidRepolhitzerSpot(int theGridX, int theGridY);
+    bool                            IsValidDesarmarbustoSpot(int theGridX, int theGridY);
 	void							MouseDownCobcannonFire(int x, int y, int theClickCount);
-	int								KillAllZombiesInRadius(int theRow, int theX, int theY, int theRadius, int theRowRange, bool theBurn, int theDamageRangeFlags); // @Patoke: modified function prototype
+	void							MouseDownAbacaspinhoJump(int x, int y);
+    void                            MouseDownMortarFire(int x, int y);
+	int								KillAllZombiesInRadius(int theRow, int theX, int theY, int theRadius, int theRowRange, bool theBurn, int theDamageRangeFlags);
+	int								GetAllZombiesInRadius(int theRow, int theX, int theY, int theRadius, int theRowRange, int theDamageRangeFlags);
 	/*inline*/ int					GetSeedBankExtraWidth();
 	bool							IsFlagWave(int theWaveNumber);
 	void							DrawHouseDoorTop(Graphics* g);

@@ -415,3 +415,6 @@ tools/read-compiled/target
 *.sublime-workspace
 
 build-*/
+/build_msys
+/build_vs
+build_output.txt

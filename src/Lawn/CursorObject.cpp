@@ -218,6 +218,8 @@ void CursorObject::Draw(Graphics* g)
         break;
 
     case CursorType::CURSOR_TYPE_COBCANNON_TARGET:
+    case CursorType::CURSOR_TYPE_ABACASPINHO_TARGET:
+    case CursorType::CURSOR_TYPE_MORTAR_TARGET:
     {
         HitResult aHitResult;
         mBoard->MouseHitTest(mBoard->mPrevMouseX, mBoard->mPrevMouseY, &aHitResult);

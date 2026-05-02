@@ -1,11 +1,20 @@
 {
   "dependencies": [
-    "libjpeg-turbo",
+    {
+      "name": "libjpeg-turbo",
+      "default-features": false
+    },
     "libogg",
     "libopenmpt",
-    "libpng",
+    {
+      "name": "libpng",
+      "default-features": false
+    },
     "libvorbis",
-    "mpg123",
+    {
+      "name": "mpg123",
+      "default-features": false
+    },
     {
       "name": "sdl2",
       "platform": "!android"

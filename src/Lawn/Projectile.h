@@ -60,6 +60,7 @@ public:
     bool                    mDead;
     int32_t                 mAnimTicksPerFrame;
     ProjectileMotion        mMotionType;
+    bool                    mUnderground;
     ProjectileType          mProjectileType;
     int32_t                 mProjectileAge;
     int32_t                 mClickBackoffCounter;

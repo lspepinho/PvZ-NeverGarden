@@ -158,6 +158,7 @@ void Zombie::ZombieInitialize(int theRow, ZombieType theType, bool theVariant, Z
     mFlatTires = false;
     mScaleZombie = 1.0f;
     mUseLadderCol = -1;
+    mUnderground = (mBoard && mBoard->mUndergroundView);
     mShieldHealth = 0;
     mHelmHealth = 0;
     mAltitude = 0.0f;
@@ -6181,6 +6182,22 @@ void Zombie::DrawButter(Graphics* g, const ZombieDrawPosition& theDrawPos)
 // GOTY @Patoke: 0x53EC85
 void Zombie::Draw(Graphics* g)
 {
+    Graphics aZombieGraphics(*g);
+    if (mBoard)
+    {
+        if (mUnderground && !mBoard->mUndergroundView)
+        {
+            aZombieGraphics.SetColor(Color(255, 255, 255, 100));
+            aZombieGraphics.SetColorizeImages(true);
+        }
+        else if (!mUnderground && mBoard->mUndergroundView)
+        {
+            aZombieGraphics.SetColor(Color(20, 10, 5, 150));
+            aZombieGraphics.SetColorizeImages(true);
+        }
+    }
+    g = &aZombieGraphics;
+
     if (mZombieHeight == ZombieHeight::HEIGHT_GETTING_BUNGEE_DROPPED)
         return;
 
@@ -6239,6 +6256,26 @@ bool Zombie::CanTargetPlant(Plant* thePlant, ZombieAttackType theAttackType)
 
     if (thePlant->NotOnGround() || thePlant->mSeedType == SeedType::SEED_TANGLEKELP)
         return false;
+
+    bool plantIsUnderground = thePlant->mUndergroundPlant;
+    if (thePlant->mSeedType == SeedType::SEED_CENOURRA)
+    {
+        if (thePlant->mCenourraIsUpper)
+        {
+            // Wallnut shell intact: surface zombies eat the wallnut, underground zombies interact with chomper
+            plantIsUnderground = mUnderground; // Match the zombie's layer so it always interacts
+        }
+        else
+        {
+            // Chomper has risen to surface: only surface zombies interact
+            plantIsUnderground = false;
+        }
+    }
+    
+    if (mUnderground != plantIsUnderground)
+    {
+        return false;
+    }
 
     if (!mInPool && mBoard->IsPoolSquare(thePlant->mPlantCol, thePlant->mRow))
         return false;
@@ -6342,6 +6379,7 @@ Zombie* Zombie::FindZombieTarget()
     while (mBoard->IterateZombies(aZombie))
     {
         if (mMindControlled != aZombie->mMindControlled && 
+            aZombie->mUnderground == mUnderground &&
             !aZombie->IsFlying() && 
             aZombie->mZombiePhase != ZombiePhase::PHASE_DIGGER_TUNNELING && 
             aZombie->mZombiePhase != ZombiePhase::PHASE_BUNGEE_DIVING && 
@@ -6350,6 +6388,7 @@ Zombie* Zombie::FindZombieTarget()
             aZombie->mZombieHeight != ZombieHeight::HEIGHT_GETTING_BUNGEE_DROPPED && 
             !aZombie->IsDeadOrDying() && 
             aZombie->mRow == mRow)
+
         {
             Rect aZombieRect = aZombie->GetZombieRect();
             int aOverlap = GetRectOverlap(aAttackRect, aZombieRect);

@@ -95,6 +95,7 @@ void Projectile::ProjectileInitialize(int theX, int theY, int theRenderOrder, in
 	mProjectileAge = 0;
 	mClickBackoffCounter = 0;
 	mAnimTicksPerFrame = 0;
+	mUnderground = mBoard->mUndergroundView;
 
 	switch (mProjectileType)
 	{
@@ -230,7 +231,7 @@ Zombie* Projectile::FindCollisionTarget()
 	Zombie* aZombie = nullptr;
 	while (mBoard->IterateZombies(aZombie))
 	{
-		if ((aZombie->mZombieType == ZombieType::ZOMBIE_BOSS || aZombie->mRow == mRow) && aZombie->EffectedByDamage(static_cast<unsigned int>(mDamageRangeFlags)))
+		if ((aZombie->mZombieType == ZombieType::ZOMBIE_BOSS || aZombie->mRow == mRow) && aZombie->EffectedByDamage((unsigned int)mDamageRangeFlags) && aZombie->mUnderground == mUnderground)
 		{
 			if (aZombie->mZombiePhase == ZombiePhase::PHASE_SNORKEL_WALKING_IN_POOL && mPosZ >= 45.0f)
 			{
@@ -427,6 +428,12 @@ bool Projectile::IsZombieHitBySplash(Zombie* theZombie)
 		aProjectileRect.mWidth = 100;
 	}
 
+	bool aHitUnderground = (mDamageRangeFlags & DamageRangeFlags::DAMAGES_UNDERGROUND) != 0;
+	if (theZombie->mUnderground != mUnderground && !aHitUnderground)
+	{
+		return false;
+	}
+
 	int aRowDeviation = theZombie->mRow - mRow;
 	Rect aZombieRect = theZombie->GetZombieRect();
 	if (theZombie->IsFireResistant() && mProjectileType == ProjectileType::PROJECTILE_FIREBALL)
@@ -457,44 +464,41 @@ void Projectile::DoSplashDamage(Zombie* theZombie)
 {
 	const ProjectileDefinition& aProjectileDef = GetProjectileDef();
 
-	int aZombiesGetSplashed = 0;
-	Zombie* aZombie = nullptr;
-	while (mBoard->IterateZombies(aZombie))
-	{
-		if (aZombie != theZombie && IsZombieHitBySplash(aZombie))
-		{
-			aZombiesGetSplashed++;
-		}
-	}
-
 	int aOriginalDamage = aProjectileDef.mDamage;
-	int aSplashDamage = aProjectileDef.mDamage / 3;
-	int aMaxSplashDamageAmount = aOriginalDamage * 7;
+    if (mProjectileType == ProjectileType::PROJECTILE_MELON && (mDamageRangeFlags & DamageRangeFlags::DAMAGES_UNDERGROUND))
+    {
+        aOriginalDamage = 180; // 180 direct damage, 60 splash
+    }
+
+	int aSplashDamage = aOriginalDamage / 3;
+	int aMaxSplashDamageAmount = aSplashDamage * 7;
 	if (mProjectileType == ProjectileType::PROJECTILE_FIREBALL)
 	{
-		aMaxSplashDamageAmount = aOriginalDamage;
-	}
-	int aSplashDamageAmount = aSplashDamage * aZombiesGetSplashed;
-	if (aSplashDamageAmount > aMaxSplashDamageAmount)
-	{
-		//aSplashDamage *= aMaxSplashDamageAmount / aSplashDamage;
-		aSplashDamage = aOriginalDamage * aMaxSplashDamageAmount / (aSplashDamageAmount * 3);
-		aSplashDamage = std::max(aSplashDamage, 1);
+		aSplashDamage = aOriginalDamage;
+		aMaxSplashDamageAmount = aSplashDamage;
 	}
 
-	aZombie = nullptr;
+	Zombie* aZombie = nullptr;
 	while (mBoard->IterateZombies(aZombie))
 	{
 		if (IsZombieHitBySplash(aZombie))
 		{
 			unsigned int aDamageFlags = GetDamageFlags(aZombie);
+            bool isUndergroundAndResistant = aZombie->mUnderground && !mUnderground;
+
 			if (aZombie == theZombie)
 			{
-				aZombie->TakeDamage(aOriginalDamage, aDamageFlags);
+                int aFinalOriginal = isUndergroundAndResistant ? aOriginalDamage / 2 : aOriginalDamage;
+				aZombie->TakeDamage(aFinalOriginal, aDamageFlags);
 			}
 			else
 			{
-				aZombie->TakeDamage(aSplashDamage, aDamageFlags);
+                int aFinalSplash = isUndergroundAndResistant ? aSplashDamage / 2 : aSplashDamage;
+				if (aFinalSplash <= aMaxSplashDamageAmount)
+				{
+					aZombie->TakeDamage(aFinalSplash, aDamageFlags);
+					aMaxSplashDamageAmount -= aFinalSplash;
+				}
 			}
 		}
 	}
@@ -970,6 +974,22 @@ void Projectile::Update()
 
 void Projectile::Draw(Graphics* g)
 {
+	Graphics aProjectileGraphics(*g);
+	if (mBoard)
+	{
+		if (mUnderground && !mBoard->mUndergroundView)
+		{
+			aProjectileGraphics.SetColor(Color(255, 255, 255, 100));
+			aProjectileGraphics.SetColorizeImages(true);
+		}
+		else if (!mUnderground && mBoard->mUndergroundView)
+		{
+			aProjectileGraphics.SetColor(Color(20, 10, 5, 150));
+			aProjectileGraphics.SetColorizeImages(true);
+		}
+	}
+	g = &aProjectileGraphics;
+
 	const ProjectileDefinition& aProjectileDef = GetProjectileDef();
 
 	Image* aImage = nullptr;

@@ -211,6 +211,17 @@ public:
     bool                    mIsAsleep;
     bool                    mIsOnBoard;
     bool                    mHighlighted;
+    bool                    mUndergroundPlant;
+    int                     mArbambuLevel;
+    int                     mAbacaspinhoGrown;
+    int                     mDandelionBuffCounter;
+    int                     mCenourraEatCountdown;
+    int                     mDandelionBuffType;
+    int                     mDandelionBuffTimeLeft;
+    bool                    mCenourraIsUpper;
+    int                     mRepolhitzerMode;
+    int                     mRepolhitzerTimer;
+    int                     mDesarmarbustoPushDelay;
 
 public:
     Plant();
@@ -223,6 +234,7 @@ public:
     void                    DoSpecial();
     void                    Fire(Zombie* theTargetZombie, int theRow, PlantWeapon thePlantWeapon = PlantWeapon::WEAPON_PRIMARY);
     Zombie*                 FindTargetZombie(int theRow, PlantWeapon thePlantWeapon = PlantWeapon::WEAPON_PRIMARY);
+    Zombie*                 FindUndergroundTargetZombie(int theRow);
     void                    Die();
     void                    UpdateProductionPlant();
     void                    UpdateShooter();
@@ -316,6 +328,15 @@ public:
     void                    GoldMagnetFindTargets();
     bool                    IsAGoldMagnetAboutToSuck();
     bool                    DrawMagnetItemsOnTop();
+    void                    UpdateArbambu();
+    void                    UpdateAbacaspinho();
+    void                    UpdateAtrasarbusto();
+    void                    UpdateDesarmarbusto();
+    void                    UpdateMortarlancia();
+    void                    UpdateRepolhitzer();
+    void                    UpdateDenteDeLeao();
+    void                    UpdateCenourra();
+    void                    UpdateLampadaSaoJorge();
 };
 
 float                       PlantDrawHeightOffset(Board* theBoard, Plant* thePlant, SeedType theSeedType, int theCol, int theRow);

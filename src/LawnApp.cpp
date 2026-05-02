@@ -2387,6 +2387,9 @@ int LawnApp::GetSeedsAvailable()
 // GOTY @Patoke: 0x456FE0
 bool LawnApp::HasSeedType(SeedType theSeedType)
 {
+	if (theSeedType >= SeedType::SEED_ARBAMBU && theSeedType <= SeedType::SEED_LAMPADA_DE_SAO_JORGE)
+		return true;
+
 	if (IsTrialStageLocked() && theSeedType >= SeedType::SEED_JALAPENO)
 		return false;
 

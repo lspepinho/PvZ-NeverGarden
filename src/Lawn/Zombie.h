@@ -184,6 +184,7 @@ public:
     bool                            mIsFireBall;
     ReanimationID                   mMoweredReanimID;
     int32_t                         mLastPortalX;
+    bool                            mUnderground;
 
 public:
     Zombie();

@@ -217,6 +217,7 @@ void LawnMower::Update()
             aZombie->mRow - mRow == 0 && 
             aZombie->mZombiePhase != ZombiePhase::PHASE_ZOMBIE_MOWERED && 
             !aZombie->IsTangleKelpTarget() && 
+            !aZombie->mUnderground &&
             aZombie->EffectedByDamage(127U))
         {
             Rect aZombieRect = aZombie->GetZombieRect();
