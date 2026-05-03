@@ -44,6 +44,7 @@ file(GLOB SOURCES
 	src/Lawn/*.cpp
 	src/Lawn/Widget/*.cpp
 	src/Lawn/System/*.cpp
+	src/WidescreenPatcher.cpp
 )
 
 # these files are included and must not be built in the project
@@ -95,21 +96,29 @@ else()
 		find_package(Ogg CONFIG REQUIRED)
 		find_package(libopenmpt CONFIG REQUIRED)
 		find_package(mpg123 CONFIG REQUIRED)
+		find_package(CURL CONFIG REQUIRED)
+		find_package(minizip CONFIG REQUIRED)
 		set(VORBIS_LIB Vorbis::vorbis Vorbis::vorbisfile)
 		set(OGG_LIB Ogg::ogg)
 		set(OPENMPT_LIB libopenmpt::libopenmpt)
 		set(MPG123_LIB MPG123::libmpg123)
+		set(CURL_LIB CURL::libcurl)
+		set(MINIZIP_LIB minizip::minizip)
 	else()
 		find_library(OGG_LIBRARY NAMES ogg libogg REQUIRED)
 		find_library(VORBIS_LIBRARY NAMES vorbis libvorbis REQUIRED)
 		find_library(VORBISFILE_LIBRARY NAMES vorbisfile libvorbisfile REQUIRED)
 		find_library(OPENMPT_LIBRARY NAMES openmpt libopenmpt REQUIRED)
 		find_library(MPG123_LIBRARY NAMES mpg123 libmpg123 REQUIRED)
+		find_library(CURL_LIBRARY NAMES curl libcurl REQUIRED)
+		find_library(MINIZIP_LIBRARY NAMES minizip libminizip REQUIRED)
 
 		set(VORBIS_LIB ${VORBISFILE_LIBRARY} ${VORBIS_LIBRARY})
 		set(OGG_LIB ${OGG_LIBRARY})
 		set(OPENMPT_LIB ${OPENMPT_LIBRARY})
 		set(MPG123_LIB ${MPG123_LIBRARY})
+		set(CURL_LIB ${CURL_LIBRARY})
+		set(MINIZIP_LIB ${MINIZIP_LIBRARY})
 	endif()
 	list(APPEND SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/src/SexyAppFramework/platform/default/Window.cpp
@@ -249,6 +258,8 @@ else()
 		PNG::PNG
 		JPEG::JPEG
 		ZLIB::ZLIB
+		${CURL_LIB}
+		${MINIZIP_LIB}
 		SDL2::SDL2main
 		${SDL2_LINK_TARGET}
 		Threads::Threads

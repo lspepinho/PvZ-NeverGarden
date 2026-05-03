@@ -19,6 +19,8 @@
       "name": "sdl2",
       "platform": "!android"
     },
-    "zlib"
+    "zlib",
+    "curl",
+    "minizip"
   ]
 }

@@ -1186,7 +1186,7 @@ void Challenge::MouseDownWhackAZombie(int theX, int theY)
 		if (!aZombie->IsDeadOrDying())
 		{
 			Rect aZombieRect = aZombie->GetZombieRect();
-			if (GetCircleRectOverlap(theX, theY - 20, 45, aZombieRect))
+			if (GetCircleRectOverlap(theX - gLawnOffset, theY - 20, 45, aZombieRect))
 			{
 				if (aTopZombie == nullptr || aZombie->mRenderOrder >= aTopZombie->mRenderOrder)
 				{

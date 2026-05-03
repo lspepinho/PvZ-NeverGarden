@@ -39,6 +39,8 @@ jobs:
           mpg123 \
           ninja \
           sdl2-compat \
+          curl \
+          minizip \
           sudo
 
     - name: Create Builder User
@@ -93,6 +95,8 @@ jobs:
           mingw-w64-ucrt-x86_64-mpg123
           mingw-w64-ucrt-x86_64-ninja
           mingw-w64-ucrt-x86_64-SDL2
+          mingw-w64-ucrt-x86_64-curl
+          mingw-w64-ucrt-x86_64-minizip
 
     - name: Compile PvZ-Portable for Windows
       shell: msys2 {0}
@@ -200,6 +204,8 @@ jobs:
           libvorbis \
           mpg123 \
           ninja \
+          curl \
+          minizip \
           sdl2
 
     - name: Build PvZ-Portable

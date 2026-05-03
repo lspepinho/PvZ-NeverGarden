@@ -1178,6 +1178,7 @@ void SeedBank::UpdateWidth()
 {
 	mNumPackets = mBoard->GetNumSeedsInBank();
 	mWidth = IMAGE_SEEDBANK->GetWidth() + mBoard->GetSeedBankExtraWidth();
+    mX = mBoard->GetSeedBankX();
 	for (int i = 0; i < mNumPackets; i++)
 	{
 		mSeedPackets[i].mX = mBoard->GetSeedPacketPositionX(i);

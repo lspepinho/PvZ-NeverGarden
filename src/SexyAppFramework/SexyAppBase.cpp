@@ -37,6 +37,7 @@
 #include <filesystem>
 
 #include <SDL.h>
+#include "../WidescreenPatcher.h"
 
 #ifdef __SWITCH__
 #include <switch.h>
@@ -1560,6 +1561,15 @@ void SexyAppBase::RestoreScreenResolution()
 	
 void SexyAppBase::DoExit(int theCode)
 {
+#ifdef _WIN32
+	char* aPrefPath = SDL_GetPrefPath("io.github.wszqkzqk", "PvZPortable");
+	if (aPrefPath) {
+		std::string logPath = std::string(aPrefPath) + "cache64/patcher.log";
+		FILE* f = fopen(logPath.c_str(), "a");
+		if (f) { fprintf(f, "DoExit called with code %d\n", theCode); fclose(f); }
+		SDL_free(aPrefPath);
+	}
+#endif
 	RestoreScreenResolution();
 
 #if defined(__EMSCRIPTEN__)
@@ -3001,6 +3011,15 @@ void SexyAppBase::LoadResourceManifest()
 
 void SexyAppBase::ShowResourceError(bool doExit)
 {
+#ifdef _WIN32
+	char* aPrefPath = SDL_GetPrefPath("io.github.wszqkzqk", "PvZPortable");
+	if (aPrefPath) {
+		std::string logPath = std::string(aPrefPath) + "cache64/patcher.log";
+		FILE* f = fopen(logPath.c_str(), "a");
+		if (f) { fprintf(f, "ShowResourceError called: %s\n", mResourceManager->GetErrorText().c_str()); fclose(f); }
+		SDL_free(aPrefPath);
+	}
+#endif
 	Popup(mResourceManager->GetErrorText());	
 	if (doExit)
 		DoExit(0);
@@ -3330,6 +3349,10 @@ void SexyAppBase::Init()
 	{
 		SetResourceFolder(mResourceDir);
 	}
+
+#if !defined(__EMSCRIPTEN__) && !defined(__SWITCH__) && !defined(__3DS__)
+	PatchWidescreenPak(GetResourcePath(""));
+#endif
 
 	gPakInterface->AddPakFile(GetResourcePath("main.pak"));
 

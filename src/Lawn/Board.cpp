@@ -86,7 +86,7 @@ Board::Board(LawnApp* theApp)
 	mCursorObject = new CursorObject();
 	mCursorPreview = new CursorPreview();
 	mSeedBank = new SeedBank();
-	mSeedBank->mX = gLawnOffset;
+	mSeedBank->mX = GetSeedBankX();
 	mSeedBank->mY = 0;
 	mCutScene = new CutScene();
 	mSpecialGraveStoneX = -1;
@@ -1345,7 +1345,7 @@ void Board::InitSurvivalStage()
 
 Rect Board::GetShovelButtonRect()
 {
-	Rect aRect(GetSeedBankExtraWidth() + 456 + gLawnOffset, 0, Sexy::IMAGE_SHOVELBANK->GetWidth(), Sexy::IMAGE_SHOVELBANK->GetHeight());
+	Rect aRect(GetSeedBankX() + GetSeedBankExtraWidth() + 456, 0, Sexy::IMAGE_SHOVELBANK->GetWidth(), Sexy::IMAGE_SHOVELBANK->GetHeight());
 	if (mApp->IsSlotMachineLevel() || mApp->IsSquirrelLevel())
 	{
 		aRect.mX = 600;
@@ -3226,7 +3226,7 @@ Zombie* Board::ZombieHitTest(int theMouseX, int theMouseY)
 			continue;
 
 		// 范围判定
-		if (aZombie->GetZombieRect().Contains(theMouseX, theMouseY))
+		if (aZombie->GetZombieRect().Contains(theMouseX - gLawnOffset, theMouseY))
 		{
 			if (aRecord == nullptr || aZombie->mY > aRecord->mY)
 			{
@@ -3256,7 +3256,7 @@ bool Board::IsPlantInGoldWateringCanRange(int theMouseX, int theMouseY, Plant* t
 
 	if (GetTopPlantAt(thePlant->mPlantCol, thePlant->mRow, PlantPriority::TOPPLANT_ZEN_TOOL_ORDER) == thePlant)
 	{
-		return thePlant->mX + 40 >= aMinX && thePlant->mX + 40 < aMaxX && thePlant->mY + 40 >= aMinY && thePlant->mY + 40 < aMaxY;
+		return thePlant->mX + 40 >= aMinX - gLawnOffset && thePlant->mX + 40 < aMaxX - gLawnOffset && thePlant->mY + 40 >= aMinY && thePlant->mY + 40 < aMaxY;
 	}
 	return false;
 }
@@ -4257,7 +4257,7 @@ Plant* Board::SpecialPlantHitTest(int x, int y)
 		if (aPlant->mSeedType == SeedType::SEED_PUMPKINSHELL)
 		{
 			float aMinDist = GetTopPlantAt(aPlant->mPlantCol, aPlant->mRow, PlantPriority::TOPPLANT_ONLY_NORMAL_POSITION) ? 25 : 0;
-			float aDistance = Distance2D(x, y, aPlant->mX + 40, aPlant->mY + 40);
+			float aDistance = Distance2D(x - gLawnOffset, y, aPlant->mX + 40, aPlant->mY + 40);
 			if (aDistance >= aMinDist && aDistance <= 50 && y > aPlant->mY + 25)
 			{
 				return aPlant;
@@ -4265,15 +4265,15 @@ Plant* Board::SpecialPlantHitTest(int x, int y)
 		}
 		else if (Plant::IsFlying(aPlant->mSeedType))
 		{
-			if (Distance2D(x, y, aPlant->mX + 40, aPlant->mY) < 15)
+			if (Distance2D(x - gLawnOffset, y, aPlant->mX + 40, aPlant->mY) < 15)
 			{
 				return aPlant;
 			}
 		}
         else if (aPlant->mSeedType == SeedType::SEED_MORTARLANCIA || aPlant->mSeedType == SeedType::SEED_REPOLHITZER || aPlant->mSeedType == SeedType::SEED_DESARMARBUSTO)
         {
-            int aGridX = PixelToGridX(x - gLawnOffset, y);
-            int aGridY = PixelToGridY(x - gLawnOffset, y);
+            int aGridX = PixelToGridX(x, y);
+            int aGridY = PixelToGridY(x, y);
             bool isOccupying = false;
             if (aPlant->mSeedType == SeedType::SEED_MORTARLANCIA)
             {
@@ -4395,7 +4395,7 @@ bool Board::MouseHitTest(int x, int y, HitResult* theHitResult)
 		while (IterateCoins(aCoin))
 		{
 			HitResult aHitResultCoin;
-			if (aCoin->MouseHitTest(x, y, &aHitResultCoin))
+			if (aCoin->MouseHitTest(x - gLawnOffset, y, &aHitResultCoin))
 			{
 				aCoin = (Coin*)aHitResultCoin.mObject;
 				if (aTopCoin == nullptr || aCoin->mRenderOrder >= aTopCoin->mRenderOrder)
@@ -9161,6 +9161,15 @@ int Board::GetSeedBankExtraWidth()
 	return aNumPackets <= 6 ? 0 : aNumPackets == 7 ? 60 : aNumPackets == 8 ? 76 : aNumPackets == 9 ? 112 : 153;
 }
 
+int Board::GetSeedBankX()
+{
+    if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_ZEN_GARDEN || mApp->mGameMode == GameMode::GAMEMODE_TREE_OF_WISDOM)
+        return gLawnOffset;
+
+    int aTotalWidth = GetSeedBankExtraWidth() + 456 + IMAGE_SHOVELBANK->GetWidth();
+    return (BOARD_WIDTH - aTotalWidth) / 2;
+}
+
 void Board::OffsetYForPlanting(int& theY, SeedType theSeedType)
 {
 	if (Plant::IsFlying(theSeedType) || theSeedType == SeedType::SEED_GRAVEBUSTER)
@@ -9223,7 +9232,6 @@ int Board::PlantingPixelToGridY(int theX, int theY, SeedType theSeedType)
 
 int Board::PixelToGridX(int theX, int theY)
 {
-	theX -= gLawnOffset;
 	if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_ZEN_GARDEN)
 	{
 		if (mBackground == BackgroundType::BACKGROUND_GREENHOUSE || 
@@ -9234,6 +9242,7 @@ int Board::PixelToGridX(int theX, int theY)
 		}
 	}
 
+	theX -= gLawnOffset;
 	if (theX < LAWN_XMIN)
 		return -1;
 
