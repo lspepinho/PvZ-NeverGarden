@@ -1345,7 +1345,8 @@ void Board::InitSurvivalStage()
 
 Rect Board::GetShovelButtonRect()
 {
-	Rect aRect(GetSeedBankX() + GetSeedBankExtraWidth() + 456, 0, Sexy::IMAGE_SHOVELBANK->GetWidth(), Sexy::IMAGE_SHOVELBANK->GetHeight());
+	int aSeedBankWidth = 446 + GetSeedBankExtraWidth();
+	Rect aRect(GetSeedBankX() + aSeedBankWidth + 10, 0, 70, 70);
 	if (mApp->IsSlotMachineLevel() || mApp->IsSquirrelLevel())
 	{
 		aRect.mX = 600;
@@ -6080,6 +6081,7 @@ void Board::Update()
 	UpdateLevelEndSequence();
 	mPrevMouseX = mApp->mWidgetManager->mLastMouseX;
 	mPrevMouseY = mApp->mWidgetManager->mLastMouseY;
+	mSeedBank->mX = GetSeedBankX();
 }
 
 // GOTY @Patoke: 0x418940
@@ -9166,8 +9168,9 @@ int Board::GetSeedBankX()
     if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_ZEN_GARDEN || mApp->mGameMode == GameMode::GAMEMODE_TREE_OF_WISDOM)
         return gLawnOffset;
 
-    int aTotalWidth = GetSeedBankExtraWidth() + 456 + IMAGE_SHOVELBANK->GetWidth();
-    return (BOARD_WIDTH - aTotalWidth) / 2;
+    int aSeedBankWidth = 446 + GetSeedBankExtraWidth();
+    int aTotalWidth = aSeedBankWidth + 10 + 70;
+    return (1066 - aTotalWidth) / 2;
 }
 
 void Board::OffsetYForPlanting(int& theY, SeedType theSeedType)

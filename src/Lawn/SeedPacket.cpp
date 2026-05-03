@@ -1177,7 +1177,7 @@ void SeedBank::UpdateConveyorBelt()
 void SeedBank::UpdateWidth()
 {
 	mNumPackets = mBoard->GetNumSeedsInBank();
-	mWidth = IMAGE_SEEDBANK->GetWidth() + mBoard->GetSeedBankExtraWidth();
+	mWidth = 446 + mBoard->GetSeedBankExtraWidth();
     mX = mBoard->GetSeedBankX();
 	for (int i = 0; i < mNumPackets; i++)
 	{
