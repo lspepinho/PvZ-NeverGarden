@@ -122,7 +122,8 @@ static bool DownloadFile(const char* url, const fs::path& outPath)
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 	curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 5L);
 	curl_easy_setopt(curl, CURLOPT_TIMEOUT, 120L);
-	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, "PvZ-Portable/1.0");
 
 	CURLcode res = curl_easy_perform(curl);
