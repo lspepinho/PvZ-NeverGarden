@@ -1,4 +1,5 @@
 #include "WidescreenPatcher.h"
+#include "SexyAppFramework/Common.h"
 
 #include <cstdio>
 #include <cstring>
@@ -43,10 +44,9 @@ static const char* kSkipFiles[] = {
 
 static void LogPatch(const std::string& msg)
 {
-	char* aPrefPath = SDL_GetPrefPath("io.github.wszqkzqk", "PvZPortable");
-	if (!aPrefPath) return;
-	fs::path logPath = fs::path(aPrefPath) / "cache64" / kLogFileName;
-	SDL_free(aPrefPath);
+	std::string aAppData = Sexy::GetAppDataFolder();
+	if (aAppData.empty()) return;
+	fs::path logPath = fs::path(aAppData) / "cache64" / kLogFileName;
 
 	fs::create_directories(logPath.parent_path());
 	std::ofstream ofs(logPath, std::ios::app);
@@ -403,14 +403,10 @@ bool PatchWidescreenPak(const std::filesystem::path& theResourceDir)
 {
     try {
         curl_global_init(CURL_GLOBAL_DEFAULT);
-        // Determine cache64 path (inside save directory)
-        fs::path aSaveDir;
-
-        char* aPrefPath = SDL_GetPrefPath("io.github.wszqkzqk", "PvZPortable");
-        if (aPrefPath)
+        std::string aAppData = Sexy::GetAppDataFolder();
+        if (!aAppData.empty())
         {
-            aSaveDir = fs::path(aPrefPath);
-            SDL_free(aPrefPath);
+            aSaveDir = fs::path(aAppData);
         }
 
         if (aSaveDir.empty())

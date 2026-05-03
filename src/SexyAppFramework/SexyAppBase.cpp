@@ -3356,12 +3356,18 @@ void SexyAppBase::Init()
 		if (aExtPath)
 		{
 			SetAppDataFolder(std::string(aExtPath) + "/");
+			printf("[Widescreen] Android AppData: %s\n", aExtPath);
 			// On Android, if main.pak exists in the files folder, use it as resource dir
 			std::string aPakPath = std::string(aExtPath) + "/main.pak";
 			if (FileExists(aPakPath))
 			{
+				printf("[Widescreen] Found main.pak in external storage\n");
 				mResourceDir = aExtPath;
 				SetResourceFolder(mResourceDir);
+			}
+			else
+			{
+				printf("[Widescreen] main.pak NOT found in %s\n", aPakPath.c_str());
 			}
 		}
 	}
