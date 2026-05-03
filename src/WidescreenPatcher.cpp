@@ -403,6 +403,7 @@ bool PatchWidescreenPak(const std::filesystem::path& theResourceDir)
 {
     try {
         curl_global_init(CURL_GLOBAL_DEFAULT);
+        fs::path aSaveDir;
         std::string aAppData = Sexy::GetAppDataFolder();
         if (!aAppData.empty())
         {
