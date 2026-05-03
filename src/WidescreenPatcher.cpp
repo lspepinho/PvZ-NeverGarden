@@ -43,14 +43,10 @@ static const char* kSkipFiles[] = {
 
 static void LogPatch(const std::string& msg)
 {
-#ifdef _WIN32
 	char* aPrefPath = SDL_GetPrefPath("io.github.wszqkzqk", "PvZPortable");
 	if (!aPrefPath) return;
 	fs::path logPath = fs::path(aPrefPath) / "cache64" / kLogFileName;
 	SDL_free(aPrefPath);
-#else
-	fs::path logPath = fs::path("cache64") / kLogFileName;
-#endif
 
 	fs::create_directories(logPath.parent_path());
 	std::ofstream ofs(logPath, std::ios::app);
@@ -405,31 +401,23 @@ static bool RepackPak(const fs::path& pakPath, const std::vector<PakEntry>& entr
 
 bool PatchWidescreenPak(const std::filesystem::path& theResourceDir)
 {
-	// Determine cache64 path (inside save directory)
-	fs::path aSaveDir;
+    try {
+        curl_global_init(CURL_GLOBAL_DEFAULT);
+        // Determine cache64 path (inside save directory)
+        fs::path aSaveDir;
 
-#ifdef _WIN32
-	char* aPrefPath = SDL_GetPrefPath("io.github.wszqkzqk", "PvZPortable");
-	if (aPrefPath)
-	{
-		aSaveDir = fs::path(aPrefPath);
-		SDL_free(aPrefPath);
-	}
-#else
-	// On other platforms, use SDL pref path as well
-	char* aPrefPath = SDL_GetPrefPath("io.github.wszqkzqk", "PvZPortable");
-	if (aPrefPath)
-	{
-		aSaveDir = fs::path(aPrefPath);
-		SDL_free(aPrefPath);
-	}
-#endif
+        char* aPrefPath = SDL_GetPrefPath("io.github.wszqkzqk", "PvZPortable");
+        if (aPrefPath)
+        {
+            aSaveDir = fs::path(aPrefPath);
+            SDL_free(aPrefPath);
+        }
 
-	if (aSaveDir.empty())
-	{
-		LogPrintf("[Widescreen] Could not determine save directory");
-		return false;
-	}
+        if (aSaveDir.empty())
+        {
+            LogPrintf("[Widescreen] Could not determine save directory");
+            return false;
+        }
 
 	fs::path aCacheDir = aSaveDir / "cache64";
 	fs::path aFlagFile = aCacheDir / kFlagFileName;
@@ -568,4 +556,11 @@ bool PatchWidescreenPak(const std::filesystem::path& theResourceDir)
 
 	LogPrintf("[Widescreen] Patching complete!");
 	return true;
+    } catch (const std::exception& e) {
+        LogPrintf("[Widescreen] Exception during patching: %s", e.what());
+        return false;
+    } catch (...) {
+        LogPrintf("[Widescreen] Unknown exception during patching");
+        return false;
+    }
 }

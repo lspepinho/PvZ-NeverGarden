@@ -3350,20 +3350,19 @@ void SexyAppBase::Init()
 		SetResourceFolder(mResourceDir);
 	}
 
-#if !defined(__EMSCRIPTEN__) && !defined(__SWITCH__) && !defined(__3DS__)
-	PatchWidescreenPak(GetResourcePath(""));
-#endif
-
-	gPakInterface->AddPakFile(GetResourcePath("main.pak"));
-
-	InitPropertiesHook();
-
 #if defined(__ANDROID__) && !defined(__TERMUX__)
 	{
 		const char* aExtPath = SDL_AndroidGetExternalStoragePath();
 		if (aExtPath)
 		{
 			SetAppDataFolder(std::string(aExtPath) + "/");
+			// On Android, if main.pak exists in the files folder, use it as resource dir
+			std::string aPakPath = std::string(aExtPath) + "/main.pak";
+			if (FileExists(aPakPath))
+			{
+				mResourceDir = aExtPath;
+				SetResourceFolder(mResourceDir);
+			}
 		}
 	}
 #elif defined(__IPHONEOS__)
@@ -3404,6 +3403,14 @@ void SexyAppBase::Init()
 	{
 		SetAppDataFolder(GetResourcePath("savedata"));
 	}
+
+#if !defined(__EMSCRIPTEN__) && !defined(__SWITCH__) && !defined(__3DS__) && !defined(__IPHONEOS__)
+	PatchWidescreenPak(GetResourcePath(""));
+#endif
+
+	gPakInterface->AddPakFile(GetResourcePath("main.pak"));
+
+	InitPropertiesHook();
 
 	ReadFromRegistry();	
 
