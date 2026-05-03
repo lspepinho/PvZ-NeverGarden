@@ -351,3 +351,7 @@ elseif (IOS)
 			PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 	endif()
 endif()
+
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/assets")
+	file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/assets/" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/")
+endif()

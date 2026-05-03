@@ -1285,9 +1285,156 @@ static unsigned char *Rescale(int Width, int Height, int NewWidth, int NewHeight
 	return pTmpData;
 }
 
+Image* GetImgDiffImage(const std::string& theFileName)
+{
+	PFILE *fp = p_fopen(theFileName.c_str(), "rb");
+	if (fp == nullptr)
+		return nullptr;
+
+	char magic[4];
+	if (p_fread(magic, 1, 4, fp) != 4 || strncmp(magic, "IMGD", 4) != 0)
+	{
+		p_fclose(fp);
+		return nullptr;
+	}
+
+	int offset_x = 0, offset_y = 0, orig_name_len = 0;
+	p_fread(&offset_x, sizeof(int), 1, fp);
+	p_fread(&offset_y, sizeof(int), 1, fp);
+	p_fread(&orig_name_len, sizeof(int), 1, fp);
+
+	offset_x = static_cast<int>(Sexy::FromLE32(static_cast<uint32_t>(offset_x)));
+	offset_y = static_cast<int>(Sexy::FromLE32(static_cast<uint32_t>(offset_y)));
+	orig_name_len = static_cast<int>(Sexy::FromLE32(static_cast<uint32_t>(orig_name_len)));
+
+	std::string orig_name(orig_name_len, '\0');
+	if (orig_name_len > 0)
+		p_fread(orig_name.data(), 1, orig_name_len, fp);
+
+	png_structp png_ptr;
+	png_infop info_ptr;
+	png_uint_32 width, height;
+
+	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
+	png_set_read_fn(png_ptr, (png_voidp)fp, [](png_structp png_ptr, png_bytep data, png_size_t length) {
+		png_size_t check = (png_size_t)p_fread(data, (png_size_t)1, length, (PFILE*)png_get_io_ptr(png_ptr));
+		if (check != length) png_error(png_ptr, "Read Error");
+	});
+
+	if (png_ptr == nullptr)
+	{
+		p_fclose(fp);
+		return nullptr;
+	}
+
+	info_ptr = png_create_info_struct(png_ptr);
+	if (info_ptr == nullptr)
+	{
+		p_fclose(fp);
+		png_destroy_read_struct(&png_ptr, nullptr, nullptr);
+		return nullptr;
+	}
+
+	if (setjmp(png_jmpbuf(png_ptr)))
+	{
+		png_destroy_read_struct(&png_ptr, &info_ptr, nullptr);
+		p_fclose(fp);
+		return nullptr;
+	}
+
+	png_read_info(png_ptr, info_ptr);
+	png_get_IHDR(png_ptr, info_ptr, &width, &height, nullptr, nullptr, nullptr, nullptr, nullptr);
+
+	png_set_expand(png_ptr);
+	if constexpr (std::endian::native == std::endian::big)
+		png_set_filler(png_ptr, 0xff, PNG_FILLER_BEFORE);
+	else
+	{
+		png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
+		png_set_bgr(png_ptr);
+	}
+	png_set_palette_to_rgb(png_ptr);
+	png_set_gray_to_rgb(png_ptr);
+
+	png_bytep* row_pointers = new png_bytep[height];
+	uint32_t* diffBits = new uint32_t[width*height];
+	for (uint i = 0; i < height; i++)
+		row_pointers[i] = (png_bytep)(diffBits + i*width);
+	png_read_image(png_ptr, row_pointers);
+	png_read_end(png_ptr, info_ptr);
+	png_destroy_read_struct(&png_ptr, &info_ptr, nullptr);
+	p_fclose(fp);
+	delete[] row_pointers;
+
+	Image* anImage = new Image();
+	anImage->mWidth = width;
+	anImage->mHeight = height;
+	anImage->mBits = diffBits;
+
+	if (orig_name_len > 0)
+	{
+		Image* baseImage = ImageLib::GetImage(orig_name, false);
+		if (baseImage)
+		{
+			uint32_t* finalBits = new uint32_t[width * height];
+			memset(finalBits, 0, width * height * 4);
+
+			for (int y = 0; y < baseImage->mHeight; ++y)
+			{
+				for (int x = 0; x < baseImage->mWidth; ++x)
+				{
+					int dstX = x + offset_x;
+					int dstY = y + offset_y;
+					if (dstX >= 0 && dstX < (int)width && dstY >= 0 && dstY < (int)height)
+					{
+						finalBits[dstY * width + dstX] = baseImage->mBits[y * baseImage->mWidth + x];
+					}
+				}
+			}
+
+			for (int i = 0; i < (int)(width * height); ++i)
+			{
+				uint32_t diffPixel = diffBits[i];
+				uint32_t basePixel = finalBits[i];
+				
+				int a = (diffPixel >> 24) & 0xFF;
+				if (a == 255)
+				{
+					finalBits[i] = diffPixel;
+				}
+				else if (a > 0)
+				{
+					int r_src = (diffPixel >> 16) & 0xFF;
+					int g_src = (diffPixel >> 8) & 0xFF;
+					int b_src = diffPixel & 0xFF;
+					
+					int r_dst = (basePixel >> 16) & 0xFF;
+					int g_dst = (basePixel >> 8) & 0xFF;
+					int b_dst = basePixel & 0xFF;
+					int a_dst = (basePixel >> 24) & 0xFF;
+					
+					int out_r = (r_src * a + r_dst * (255 - a)) / 255;
+					int out_g = (g_src * a + g_dst * (255 - a)) / 255;
+					int out_b = (b_src * a + b_dst * (255 - a)) / 255;
+					int out_a = a + (a_dst * (255 - a)) / 255;
+					
+					finalBits[i] = (out_a << 24) | (out_r << 16) | (out_g << 8) | out_b;
+				}
+			}
+
+			delete[] diffBits;
+			anImage->mBits = finalBits;
+			delete baseImage;
+		}
+	}
+
+	return anImage;
+}
+
 using ImageLoader = Image* (*)(const std::string&);
 using ImageExtEntry = std::pair<std::string_view, ImageLoader>;
-static constexpr std::array<ImageExtEntry, 4> kImageExts = {
+static constexpr std::array<ImageExtEntry, 5> kImageExts = {
+	ImageExtEntry{ ".imgdiff"sv, GetImgDiffImage },
 	ImageExtEntry{ ".png"sv, GetPNGImage },
 	ImageExtEntry{ ".jpg"sv, GetJPEGImage },
 	ImageExtEntry{ ".gif"sv, GetGIFImage },

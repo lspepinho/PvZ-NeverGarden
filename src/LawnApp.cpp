@@ -104,6 +104,8 @@ bool LawnHasUsedCheatKeys()
 	return gLawnApp && gLawnApp->mPlayerInfo && gLawnApp->mPlayerInfo->mHasUsedCheatKeys;
 }
 
+int gLawnOffset = 133;
+
 LawnApp::LawnApp()
 {
 	mBoard = nullptr;
@@ -443,6 +445,7 @@ void LawnApp::MakeNewBoard()
 	KillBoard();
 	mBoard = new Board(this);
 	mBoard->Resize(0, 0, mWidth, mHeight);
+	mBoard->mClip = false;
 	mWidgetManager->AddWidget(mBoard);
 	mWidgetManager->BringToBack(mBoard);
 	mWidgetManager->SetFocus(mBoard);

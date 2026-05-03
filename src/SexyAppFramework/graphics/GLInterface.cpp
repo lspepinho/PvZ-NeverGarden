@@ -1132,15 +1132,15 @@ void GLInterface::UpdateViewport()
 
 	vw = width; vh = height;
 
-	// Letterbox to 4:3
-	if (width * 3 > height * 4)
+	// Letterbox to mWidth:mHeight (Widescreen support)
+	if (width * mApp->mHeight > height * mApp->mWidth)
 	{
-		vw = height * 4 / 3;
+		vw = height * mApp->mWidth / mApp->mHeight;
 		vx = (width - vw) / 2;
 	}
-	else if (width * 3 < height * 4)
+	else if (width * mApp->mHeight < height * mApp->mWidth)
 	{
-		vh = width * 3 / 4;
+		vh = width * mApp->mHeight / mApp->mWidth;
 		vy = (height - vh) / 2;
 	}
 

@@ -89,7 +89,7 @@ StoreScreen::StoreScreen(LawnApp* theApp) : Dialog(nullptr, nullptr, DIALOG_STOR
     mLoadedResourceNames.push_back("DelayLoad_Store");
 	for (std::string& resource : mLoadedResourceNames)
 		TodLoadResources(resource.c_str());
-    Resize(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
+    Resize(PAD, 0, BOARD_WIDTH - 2 * PAD, BOARD_HEIGHT);
     mPottedPlantSpecs.InitializePottedPlant(SEED_MARIGOLD);
     mPottedPlantSpecs.mDrawVariation = (DrawVariation)RandRangeInt(VARIATION_MARIGOLD_WHITE, VARIATION_MARIGOLD_LIGHT_GREEN);
 
@@ -132,7 +132,7 @@ StoreScreen::StoreScreen(LawnApp* theApp) : Dialog(nullptr, nullptr, DIALOG_STOR
     mNextButton->Resize(596, 402, aNextImage->mWidth, aNextImage->mHeight);
 
     mOverlayWidget = new StoreScreenOverlay(this);
-    mOverlayWidget->Resize(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
+    mOverlayWidget->Resize(-PAD, 0, BOARD_WIDTH, BOARD_HEIGHT);
 
     if (!IsPageShown(STORE_PAGE_PLANT_UPGRADES))
     {
@@ -456,11 +456,11 @@ void StoreScreen::Draw(Graphics* g)
     int aStoreSignPosY = TodAnimateCurve(50, 110, mStoreTime, -150, 0, CURVE_EASE_IN_OUT);
     if (mApp->IsNight())
     {
-        g->DrawImage(Sexy::IMAGE_STORE_BACKGROUNDNIGHT, 0, 0);
+        g->DrawImage(Sexy::IMAGE_STORE_BACKGROUNDNIGHT, -PAD, 0);
     }
     else
     {
-        g->DrawImage(Sexy::IMAGE_STORE_BACKGROUND, 0, 0);
+        g->DrawImage(Sexy::IMAGE_STORE_BACKGROUND, -PAD, 0);
     }
 
     if (!mHatchTimer && mHatchOpen)

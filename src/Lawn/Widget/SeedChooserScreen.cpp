@@ -66,13 +66,13 @@ SeedChooserScreen::SeedChooserScreen()
 	mStartButton->mDisabledImage = Sexy::IMAGE_SEEDCHOOSER_BUTTON_DISABLED;
 	mStartButton->mOverOverlayImage = Sexy::IMAGE_SEEDCHOOSER_BUTTON_GLOW;
 	mStartButton->SetFont(Sexy::FONT_DWARVENTODCRAFT18YELLOW);
-	mStartButton->Resize(154, 545, 156, 42);
+	mStartButton->Resize(154 + 2 * PAD, 545, 156, 42);
 	mStartButton->mTextOffsetY = -1;
 	EnableStartButton(false);
 
 	mMenuButton = new GameButton(SeedChooserScreen::SeedChooserScreen_Menu);
 	mMenuButton->SetLabel("[MENU_BUTTON]");
-	mMenuButton->Resize(681, -10, 117, 46);
+	mMenuButton->Resize(681 + 2 * PAD, -10, 117, 46);
 	mMenuButton->mDrawStoneButton = true;
 
 	mRandomButton = new GameButton(SeedChooserScreen::SeedChooserScreen_Random);
@@ -83,7 +83,7 @@ SeedChooserScreen::SeedChooserScreen()
 	mRandomButton->SetFont(Sexy::FONT_BRIANNETOD12);
 	mRandomButton->mColors[0] = Color(255, 240, 0);
 	mRandomButton->mColors[1] = Color(200, 200, 255);
-	mRandomButton->Resize(332, 546, 100, 30);
+	mRandomButton->Resize(332 + 2 * PAD, 546, 100, 30);
 	if (!mApp->mTodCheatKeys)
 	{
 		mRandomButton->mBtnNoDraw = true;
@@ -104,7 +104,7 @@ SeedChooserScreen::SeedChooserScreen()
 	mViewLawnButton->SetFont(Sexy::FONT_BRIANNETOD12);
 	mViewLawnButton->mColors[0] = aBtnColor;
 	mViewLawnButton->mColors[1] = aBtnColor;
-	mViewLawnButton->Resize(22, 561, aImageWidth, aImageHeight);
+	mViewLawnButton->Resize(22 + 2 * PAD, 561, aImageWidth, aImageHeight);
 	mViewLawnButton->mParentWidget = this;
 	mViewLawnButton->mTextOffsetY = 1;
 	if (!mBoard->mCutScene->IsSurvivalRepick())
@@ -121,7 +121,7 @@ SeedChooserScreen::SeedChooserScreen()
 	mAlmanacButton->SetFont(Sexy::FONT_BRIANNETOD12);
 	mAlmanacButton->mColors[0] = aBtnColor;
 	mAlmanacButton->mColors[1] = aBtnColor;
-	mAlmanacButton->Resize(560, 572, aImageWidth, aImageHeight);
+	mAlmanacButton->Resize(560 + 2 * PAD, 572, aImageWidth, aImageHeight);
 	mAlmanacButton->mParentWidget = this;
 	mAlmanacButton->mTextOffsetY = 1;
 
@@ -133,7 +133,7 @@ SeedChooserScreen::SeedChooserScreen()
 	mStoreButton->SetFont(Sexy::FONT_BRIANNETOD12);
 	mStoreButton->mColors[0] = aBtnColor;
 	mStoreButton->mColors[1] = aBtnColor;
-	mStoreButton->Resize(680, 572, aImageWidth, aImageHeight);
+	mStoreButton->Resize(680 + 2 * PAD, 572, aImageWidth, aImageHeight);
 	mStoreButton->mParentWidget = this;
 	mStoreButton->mTextOffsetY = 1;
 
@@ -142,7 +142,7 @@ SeedChooserScreen::SeedChooserScreen()
 	mImitaterButton->mOverImage = Sexy::IMAGE_IMITATERSEED;
 	mImitaterButton->mDownImage = Sexy::IMAGE_IMITATERSEED;
 	mImitaterButton->mDisabledImage = Sexy::IMAGE_IMITATERSEEDDISABLED;
-	mImitaterButton->Resize(464, 515, Sexy::IMAGE_IMITATERSEED->mWidth, Sexy::IMAGE_IMITATERSEED->mHeight);
+	mImitaterButton->Resize(464 + 2 * PAD, 515, Sexy::IMAGE_IMITATERSEED->mWidth, Sexy::IMAGE_IMITATERSEED->mHeight);
 	mImitaterButton->mParentWidget = this;
 
 	if (!mApp->CanShowAlmanac())
@@ -292,7 +292,7 @@ void SeedChooserScreen::GetSeedPositionInChooser(int theIndex, int& x, int& y)
 		int aRow = theIndex / 8;
 		int aCol = theIndex % 8;
 
-		x = aCol * 53 + 22;
+		x = aCol * 53 + 22 + PAD;
 		if (NUM_SEEDS_IN_CHOOSER > 48)
 		{
 			y = aRow * 50 + 123;
@@ -354,13 +354,13 @@ void SeedChooserScreen::Draw(Graphics* g)
 	if (!mBoard->ChooseSeedsOnCurrentLevel() || (mBoard->mCutScene && mBoard->mCutScene->IsBeforePreloading()))
 		return;
 
-	g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_BACKGROUND, 0, 87);
+	g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_BACKGROUND, PAD, 87);
 	if (mApp->HasSeedType(SEED_IMITATER))
 	{
-		g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_IMITATERADDON, 459, 503);
+		g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_IMITATERADDON, 459 + PAD, 503);
 	}
 	// @Patoke: wrong local name
-	TodDrawString(g, "[CHOOSE_YOUR_PLANTS]", 229, 110, Sexy::FONT_DWARVENTODCRAFT18YELLOW, Color::White, DS_ALIGN_CENTER);
+	TodDrawString(g, "[CHOOSE_YOUR_PLANTS]", 229 + PAD, 110, Sexy::FONT_DWARVENTODCRAFT18YELLOW, Color::White, DS_ALIGN_CENTER);
 
 	int aNumSeeds = NUM_SEEDS_IN_CHOOSER;
 	for (SeedType aSeedShadow = SEED_PEASHOOTER; aSeedShadow < aNumSeeds; aSeedShadow = (SeedType)(aSeedShadow + 1))

@@ -48,7 +48,7 @@ AlmanacDialog::AlmanacDialog(LawnApp* theApp) : LawnDialog(theApp, DIALOG_ALMANA
 	mDrawStandardBack = false;
 	mLoadedResourceNames.push_back("DelayLoad_Almanac");
 	for (size_t i = 0; i < LENGTH(mZombiePerfTest); i++) mZombiePerfTest[i] = nullptr;
-	LawnDialog::Resize(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
+	LawnDialog::Resize(PAD, 0, BOARD_WIDTH - 2 * PAD, BOARD_HEIGHT);
 
 	for (std::string& resource : mLoadedResourceNames)
 		TodLoadResources(resource.c_str());
@@ -245,8 +245,8 @@ void AlmanacDialog::Update()
 		}
 	}
 
-	int aMouseX = mApp->mWidgetManager->mLastMouseX;
-	int aMouseY = mApp->mWidgetManager->mLastMouseY;
+	int aMouseX = mApp->mWidgetManager->mLastMouseX - mX;
+	int aMouseY = mApp->mWidgetManager->mLastMouseY - mY;
 	if (SeedHitTest(aMouseX, aMouseY) != SeedType::SEED_NONE || ZombieHitTest(aMouseX, aMouseY) != ZombieType::ZOMBIE_INVALID || 
 		mCloseButton->IsMouseOver() || mIndexButton->IsMouseOver() || mPlantButton->IsMouseOver() || mZombieButton->IsMouseOver())
 	{
@@ -268,8 +268,8 @@ ZombieType AlmanacDialog::GetZombieType(int theIndex)
 
 void AlmanacDialog::DrawIndex(Graphics* g)
 {
-	g->DrawImage(Sexy::IMAGE_ALMANAC_INDEXBACK, 0, 0);
-	TodDrawString(g, "[SUBURBAN_ALMANAC_INDEX]", BOARD_WIDTH / 2, 60, Sexy::FONT_HOUSEOFTERROR28, Color(220, 220, 220), DrawStringJustification::DS_ALIGN_CENTER);
+	g->DrawImage(Sexy::IMAGE_ALMANAC_INDEXBACK, -PAD, 0);
+	TodDrawString(g, "[SUBURBAN_ALMANAC_INDEX]", 400, 60, Sexy::FONT_HOUSEOFTERROR28, Color(220, 220, 220), DrawStringJustification::DS_ALIGN_CENTER);
 	
 	if (mPlant)
 	{
@@ -287,10 +287,10 @@ void AlmanacDialog::DrawIndex(Graphics* g)
 
 void AlmanacDialog::DrawPlants(Graphics* g)
 {
-	g->DrawImage(Sexy::IMAGE_ALMANAC_PLANTBACK, 0, 0);
-	TodDrawString(g, "[SUBURBAN_ALMANAC_PLANTS]", BOARD_WIDTH / 2, 48, Sexy::FONT_HOUSEOFTERROR20, Color(213, 159, 43), DrawStringJustification::DS_ALIGN_CENTER);
+	g->DrawImage(Sexy::IMAGE_ALMANAC_PLANTBACK, -PAD, 0);
+	TodDrawString(g, "[SUBURBAN_ALMANAC_PLANTS]", 400, 48, Sexy::FONT_HOUSEOFTERROR20, Color(213, 159, 43), DrawStringJustification::DS_ALIGN_CENTER);
 
-	SeedType aSeedMouseOn = SeedHitTest(mApp->mWidgetManager->mLastMouseX, mApp->mWidgetManager->mLastMouseY);
+	SeedType aSeedMouseOn = SeedHitTest(mApp->mWidgetManager->mLastMouseX - mX, mApp->mWidgetManager->mLastMouseY - mY);
 	for (SeedType aSeedType = SeedType::SEED_PEASHOOTER; aSeedType < NUM_ALMANAC_SEEDS; aSeedType = (SeedType)(aSeedType + 1))
 	{
 		int aPosX, aPosY;
@@ -368,10 +368,10 @@ void AlmanacDialog::DrawPlants(Graphics* g)
 // GOTY @Patoke: 0x403DE0
 void AlmanacDialog::DrawZombies(Graphics* g)
 {
-	g->DrawImage(Sexy::IMAGE_ALMANAC_ZOMBIEBACK, 0, 0);
-	TodDrawString(g, "[SUBURBAN_ALMANAC_ZOMBIES]", BOARD_WIDTH / 2, 54, Sexy::FONT_DWARVENTODCRAFT24, Color(0, 196, 0), DS_ALIGN_CENTER);
+	g->DrawImage(Sexy::IMAGE_ALMANAC_ZOMBIEBACK, -PAD, 0);
+	TodDrawString(g, "[SUBURBAN_ALMANAC_ZOMBIES]", 400, 54, Sexy::FONT_DWARVENTODCRAFT24, Color(0, 196, 0), DS_ALIGN_CENTER);
 
-	ZombieType aZombieMouseOn = ZombieHitTest(mApp->mWidgetManager->mLastMouseX, mApp->mWidgetManager->mLastMouseY);
+	ZombieType aZombieMouseOn = ZombieHitTest(mApp->mWidgetManager->mLastMouseX - mX, mApp->mWidgetManager->mLastMouseY - mY);
 	for (int i = 0; i < NUM_ALMANAC_ZOMBIES; i++)
 	{
 		ZombieType aZombieType = GetZombieType(i);

@@ -86,6 +86,8 @@ Board::Board(LawnApp* theApp)
 	mCursorObject = new CursorObject();
 	mCursorPreview = new CursorPreview();
 	mSeedBank = new SeedBank();
+	mSeedBank->mX = gLawnOffset;
+	mSeedBank->mY = 0;
 	mCutScene = new CutScene();
 	mSpecialGraveStoneX = -1;
 	mSpecialGraveStoneY = -1;
@@ -152,7 +154,7 @@ Board::Board(LawnApp* theApp)
 	mUndergroundButton = new GameButton(10);
 	mUndergroundButton->mDrawStoneButton = true;
 	mUndergroundButton->SetLabel("Surface");
-	mUndergroundButton->Resize(690, 530, 100, 46);
+	mUndergroundButton->Resize(690 + 2 * PAD, 530, 100, 46);
 	mPeaShooterUsed = false; // @Patoke: added construct
 	mCatapultPlantsUsed = false; // @Patoke: added construct
 	mMushroomAndCoffeeBeansOnly = true; // @Patoke: added construct
@@ -200,19 +202,19 @@ Board::Board(LawnApp* theApp)
 	if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_ZEN_GARDEN || mApp->mGameMode == GameMode::GAMEMODE_TREE_OF_WISDOM)
 	{
 		mMenuButton->SetLabel("[MAIN_MENU_BUTTON]");
-		mMenuButton->Resize(628, -10, 163, 46);
+		mMenuButton->Resize(628 + 2 * PAD, -10, 163, 46);
 
 		mStoreButton = new GameButton(1);
 		mStoreButton->mButtonImage = IMAGE_ZENSHOPBUTTON;
 		mStoreButton->mOverImage = IMAGE_ZENSHOPBUTTON_HIGHLIGHT;
 		mStoreButton->mDownImage = IMAGE_ZENSHOPBUTTON_HIGHLIGHT;
 		mStoreButton->mParentWidget = this;
-		mStoreButton->Resize(678, 33, IMAGE_ZENSHOPBUTTON->mWidth, 40);
+		mStoreButton->Resize(678 + 2 * PAD, 33, IMAGE_ZENSHOPBUTTON->mWidth, 40);
 	}
 	else
 	{
 		mMenuButton->SetLabel("[MENU_BUTTON]");
-		mMenuButton->Resize(681, -10, 117, 46);
+		mMenuButton->Resize(681 + 2 * PAD, -10, 117, 46);
 	}
 
 	if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_LAST_STAND)
@@ -226,7 +228,7 @@ Board::Board(LawnApp* theApp)
 	if (mApp->mGameMode == GameMode::GAMEMODE_UPSELL)
 	{
 		mMenuButton->SetLabel("[MAIN_MENU_BUTTON]");
-		mMenuButton->Resize(628, -10, 163, 46);
+		mMenuButton->Resize(628 + 2 * PAD, -10, 163, 46);
 
 		mStoreButton = new GameButton(1);
 		mStoreButton->mDrawStoneButton = true;
@@ -1343,7 +1345,7 @@ void Board::InitSurvivalStage()
 
 Rect Board::GetShovelButtonRect()
 {
-	Rect aRect(GetSeedBankExtraWidth() + 456, 0, Sexy::IMAGE_SHOVELBANK->GetWidth(), Sexy::IMAGE_SHOVELBANK->GetHeight());
+	Rect aRect(GetSeedBankExtraWidth() + 456 + gLawnOffset, 0, Sexy::IMAGE_SHOVELBANK->GetWidth(), Sexy::IMAGE_SHOVELBANK->GetHeight());
 	if (mApp->IsSlotMachineLevel() || mApp->IsSquirrelLevel())
 	{
 		aRect.mX = 600;
@@ -4270,8 +4272,8 @@ Plant* Board::SpecialPlantHitTest(int x, int y)
 		}
         else if (aPlant->mSeedType == SeedType::SEED_MORTARLANCIA || aPlant->mSeedType == SeedType::SEED_REPOLHITZER || aPlant->mSeedType == SeedType::SEED_DESARMARBUSTO)
         {
-            int aGridX = PixelToGridX(x, y);
-            int aGridY = PixelToGridY(x, y);
+            int aGridX = PixelToGridX(x - gLawnOffset, y);
+            int aGridY = PixelToGridY(x - gLawnOffset, y);
             bool isOccupying = false;
             if (aPlant->mSeedType == SeedType::SEED_MORTARLANCIA)
             {
@@ -5669,7 +5671,7 @@ void Board::UpdateIce()
 			TodParticleSystem* aParticleIce = mApp->ParticleTryToGet(mIceParticleID[aRow]);
 			if (mIceTimer[aRow] == 0)
 			{
-				mIceMinX[aRow] = BOARD_ICE_START;
+				mIceMinX[aRow] = 401;
 				if (aParticleIce)
 				{
 					aParticleIce->ParticleSystemDie();
@@ -6617,6 +6619,17 @@ void Board::DrawGameObjects(Graphics* g)
 	for (int i = 0; i < aRenderItemCount; i++)
 	{
 		RenderItem& aRenderItem = aRenderList[i];
+		bool shifted = false;
+		if (aRenderItem.mRenderObjectType != RenderObjectType::RENDER_ITEM_BACKDROP &&
+			aRenderItem.mRenderObjectType != RenderObjectType::RENDER_ITEM_COIN_BANK &&
+			aRenderItem.mRenderObjectType != RenderObjectType::RENDER_ITEM_BOTTOM_UI &&
+			aRenderItem.mRenderObjectType != RenderObjectType::RENDER_ITEM_TOP_UI &&
+			aRenderItem.mRenderObjectType != RenderObjectType::RENDER_ITEM_SCREEN_FADE)
+		{
+			g->Translate(gLawnOffset, 0);
+			shifted = true;
+		}
+
 		switch (aRenderItem.mRenderObjectType)
 		{
 		case RenderObjectType::RENDER_ITEM_PLANT:
@@ -6811,6 +6824,11 @@ void Board::DrawGameObjects(Graphics* g)
 			TOD_ASSERT(false);
 			break;
 		}
+
+		if (shifted)
+		{
+			g->Translate(-gLawnOffset, 0);
+		}
 	}
 
 	TodHesitationTrace("end draw");
@@ -6864,18 +6882,18 @@ void Board::DrawProgressMeter(Graphics* g)
 	// ====================================================================================================
 	// ▲ 绘制进度条进度部分的贴图
 	// ====================================================================================================
-	g->DrawImageCel(Sexy::IMAGE_FLAGMETER, 600, 575, 0);
+	g->DrawImageCel(Sexy::IMAGE_FLAGMETER, 600 + 2 * PAD, 575, 0);
 	int aCelWidth = Sexy::IMAGE_FLAGMETER->GetCelWidth();
 	int aCelHeight = Sexy::IMAGE_FLAGMETER->GetCelHeight();
 	int aClipWidth = TodAnimateCurve(0, PROGRESS_METER_COUNTER, mProgressMeterWidth, 0, 143, TodCurves::CURVE_LINEAR);
 	Rect aSrcRect(aCelWidth - aClipWidth - 7, aCelHeight, aClipWidth, aCelHeight);
-	Rect aDstRect(aCelWidth - aClipWidth + 593, 575, aClipWidth, aCelHeight);
+	Rect aDstRect(aCelWidth - aClipWidth + 593 + 2 * PAD, 575, aClipWidth, aCelHeight);
 	g->DrawImage(Sexy::IMAGE_FLAGMETER, aDstRect, aSrcRect);
 	
 	// ====================================================================================================
 	// ▲ 根据不同关卡，绘制进度条上的文字或旗帜
 	// ====================================================================================================
-	int aPosX = aCelWidth / 2 + 600;
+	int aPosX = aCelWidth / 2 + 600 + 2 * PAD;
 	Color aColor(224, 187, 98);
 	// @Patoke: updated these
 	if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BEGHOULED || mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BEGHOULED_TWIST)
@@ -6936,7 +6954,7 @@ void Board::DrawProgressMeter(Graphics* g)
 	// ▲ 绘制进度条的额外部分
 	// ====================================================================================================
 	// 绘制“关卡进程”的小牌子
-	g->DrawImage(Sexy::IMAGE_FLAGMETERLEVELPROGRESS, 638, 589);
+	g->DrawImage(Sexy::IMAGE_FLAGMETERLEVELPROGRESS, 638 + 2 * PAD, 589);
 	// 判断是否需要绘制进度条当前位置处的小僵尸头，不需要则直接返回
 	if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BEGHOULED || 
 		mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_BEGHOULED_TWIST ||
@@ -6948,7 +6966,7 @@ void Board::DrawProgressMeter(Graphics* g)
 		return;
 	// 绘制僵尸头
 	int aHeadProgress = TodAnimateCurve(0, 150, mProgressMeterWidth, 0, 135, CURVE_LINEAR);
-	g->DrawImageCel(Sexy::IMAGE_FLAGMETERPARTS, aCelWidth - aHeadProgress + 580, 572, 0, 0);
+	g->DrawImageCel(Sexy::IMAGE_FLAGMETERPARTS, aCelWidth - aHeadProgress + 580 + 2 * PAD, 572, 0, 0);
 }
 
 void Board::DrawHouseDoorBottom(Graphics* g)
@@ -7548,7 +7566,7 @@ void Board::DrawUIBottom(Graphics* g)
 		g->DrawImageCel(Sexy::IMAGE_WAVECENTER, 480, 40, aWaveTime);
 		//TodDrawImageCelScaled(g, Sexy::IMAGE_WAVESIDE, 800, 40, 0, aWaveTime, -1.0f, 1.0f);
 		TodDrawImageCelScaled(
-			g, Sexy::IMAGE_WAVESIDE, 800, 40, aWaveTime % Sexy::IMAGE_WAVESIDE->mNumCols, 
+			g, Sexy::IMAGE_WAVESIDE, 800 + 2 * PAD, 40, aWaveTime % Sexy::IMAGE_WAVESIDE->mNumCols, 
 			aWaveTime / Sexy::IMAGE_WAVESIDE->mNumCols, -1.0f, 1.0f
 		);	
 		g->SetDrawMode(Graphics::DRAWMODE_NORMAL);
@@ -9205,6 +9223,7 @@ int Board::PlantingPixelToGridY(int theX, int theY, SeedType theSeedType)
 
 int Board::PixelToGridX(int theX, int theY)
 {
+	theX -= gLawnOffset;
 	if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_ZEN_GARDEN)
 	{
 		if (mBackground == BackgroundType::BACKGROUND_GREENHOUSE || 
@@ -9281,7 +9300,7 @@ int Board::GridToPixelX(int theGridX, int theGridY)
 		}
 	}
 
-	return theGridX * 80 + LAWN_XMIN;
+	return theGridX * 80 + 40;
 }
 
 float Board::GetPosYBasedOnRow(float thePosX, int theRow)
@@ -9289,9 +9308,9 @@ float Board::GetPosYBasedOnRow(float thePosX, int theRow)
 	if (StageHasRoof())
 	{
 		float aSlopeOffset = 0.0f;
-		if (thePosX < 440.0f)
+		if (thePosX < 440.0f + gLawnOffset)
 		{
-			aSlopeOffset = (440.0f - thePosX) * 0.25f;
+			aSlopeOffset = (440.0f + gLawnOffset - thePosX) * 0.25f;
 		}
 
 		return GridToPixelY(8, theRow) + aSlopeOffset;

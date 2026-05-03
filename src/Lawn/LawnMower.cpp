@@ -26,12 +26,13 @@
 #include "System/ReanimationLawn.h"
 #include "../Sexy.TodLib/TodFoley.h"
 #include "../Sexy.TodLib/Reanimator.h"
+#include "../GameConstants.h"
 
 void LawnMower::LawnMowerInitialize(int theRow)
 {
     mApp = (LawnApp*)gSexyAppBase;
     mRow = theRow;
-    mPosX = -160.0f;
+    mPosX = -160.0f + gLawnOffset;
     mBoard = mApp->mBoard;
     mRenderOrder = Board::MakeRenderOrder(RenderLayer::RENDER_LAYER_LAWN_MOWER, theRow, 0);
     mPosY = mBoard->GetPosYBasedOnRow(mPosX + 40.0f, theRow) + 23.0f;
@@ -87,7 +88,7 @@ void LawnMower::LawnMowerInitialize(int theRow)
 void LawnMower::UpdatePool()
 {
     bool isPoolRange = false;
-    if (mPosX > 26.0f && mPosX < 660.0f)
+    if (mPosX > 26.0f + gLawnOffset && mPosX < 660.0f + gLawnOffset)
     {
         isPoolRange = true;
     }
@@ -190,7 +191,7 @@ void LawnMower::Update()
     if (mMowerState == LawnMowerState::MOWER_ROLLING_IN)
     {
         mRollingInCounter++;
-        mPosX = TodAnimateCurveFloat(0, 100, mRollingInCounter, -160.0f, -21.0f, TodCurves::CURVE_EASE_IN_OUT);
+        mPosX = TodAnimateCurveFloat(0, 100, mRollingInCounter, -160.0f + gLawnOffset, -21.0f + gLawnOffset, TodCurves::CURVE_EASE_IN_OUT);
         if (mRollingInCounter == 100)
         {
             mMowerState = LawnMowerState::MOWER_READY;
