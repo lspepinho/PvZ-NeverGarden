@@ -7039,11 +7039,11 @@ void Board::DrawLevel(Graphics* g)
 	// ====================================================================================================
 	// ▲ 正式开始绘制关卡名称字符串
 	// ====================================================================================================
-	int aPosX = 780;
-	int aPosY = 595;
+	int aPosX = 780 + 2 * PAD;
+	int aPosY = 590;
 	if (HasProgressMeter())
 	{
-		aPosX = 593;
+		aPosX = 593 + 2 * PAD;
 	}
 	if (mChallenge->mChallengeState == ChallengeState::STATECHALLENGE_ZEN_FADING)
 	{
