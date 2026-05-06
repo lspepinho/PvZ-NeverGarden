@@ -45,7 +45,7 @@ AwardScreen::AwardScreen(LawnApp* theApp, AwardType theAwardType, bool theShowin
 	mFadeInCounter = 180;
 	mAchievementAnimTime = 0;
 	mAwardType = theAwardType;
-	mShowingAchievements = theShowingAchievements;
+ 	mShowingAchievements = theShowingAchievements;
 
 	mLoadedResourceNames.push_back("DelayLoad_AwardScreen");
 
@@ -145,7 +145,7 @@ AwardScreen::AwardScreen(LawnApp* theApp, AwardType theAwardType, bool theShowin
 	mStartButton->SetFont(Sexy::FONT_DWARVENTODCRAFT15);
 	mStartButton->mColors[ButtonWidget::COLOR_LABEL] = Color(213, 159, 43);
 	mStartButton->mColors[ButtonWidget::COLOR_LABEL_HILITE] = Color(213, 159, 43);
-	mStartButton->Resize(324, 500, 156, 42);
+	mStartButton->Resize(324 + 130, 500, 156, 42);
 	mStartButton->mTextOffsetY = -1;
 
 	// @Patoke: implemented
@@ -158,7 +158,7 @@ AwardScreen::AwardScreen(LawnApp* theApp, AwardType theAwardType, bool theShowin
 	mContinueButton->SetFont(Sexy::FONT_DWARVENTODCRAFT15);
 	mContinueButton->mColors[ButtonWidget::COLOR_LABEL] = Color(213, 159, 43);
 	mContinueButton->mColors[ButtonWidget::COLOR_LABEL_HILITE] = Color(213, 159, 43);
-	mContinueButton->Resize(324, 515, 156, 42);
+	mContinueButton->Resize(324 + 130, 515, 156, 42);
 	mContinueButton->mParentWidget = this;
 	mContinueButton->mTextOffsetY = -1;
 	mContinueButton->mBtnNoDraw = true;
@@ -192,7 +192,7 @@ AwardScreen::AwardScreen(LawnApp* theApp, AwardType theAwardType, bool theShowin
 		mStartButton->SetFont(Sexy::FONT_HOUSEOFTERROR20);
 		mStartButton->mColors[ButtonWidget::COLOR_LABEL] = Color(255, 255, 255);
 		mStartButton->mColors[ButtonWidget::COLOR_LABEL_HILITE] = Color(213, 159, 43);
-		mStartButton->Resize(325, 505, 190, 73);
+		mStartButton->Resize(325 + 130, 505, 190, 73);
 		mStartButton->mTextOffsetX = 33;
 		mStartButton->mTextOffsetY = -2;
 		mStartButton->mButtonOffsetX = -2;
@@ -278,12 +278,13 @@ void AwardScreen::DrawBottom(Graphics* g, const std::string& theTitle, const std
 	g->DrawImage(Sexy::IMAGE_AWARDSCREEN_BACK, 0, 0);
 	TodDrawString(g, theTitle, BOARD_WIDTH / 2, 58, Sexy::FONT_DWARVENTODCRAFT24, Color(213, 159, 43), DS_ALIGN_CENTER);
 	TodDrawString(g, theAward, BOARD_WIDTH / 2, 326, Sexy::FONT_DWARVENTODCRAFT18YELLOW, Color::White, DS_ALIGN_CENTER);
-	TodDrawStringWrapped(g, theMessage, Rect(285, 360, 230, 90), Sexy::FONT_BRIANNETOD16, Color(40, 50, 90), DS_ALIGN_CENTER_VERTICAL_MIDDLE);
+	TodDrawStringWrapped(g, theMessage, Rect(285 + 130, 360, 230, 90), Sexy::FONT_BRIANNETOD16, Color(40, 50, 90), DS_ALIGN_CENTER_VERTICAL_MIDDLE);
 }
 
 void AwardScreen::DrawAwardSeed(Graphics* g)
 {
-	SeedType aSeedType = mApp->GetAwardSeedForLevel(mApp->mPlayerInfo->GetLevel() - 1);
+	int aLevel = mApp->mPlayerInfo->GetLevel();
+	SeedType aSeedType = mApp->GetAwardSeedForLevel(aLevel - 1);
 	std::string aAward = Plant::GetNameString(aSeedType, SEED_NONE);
 	std::string aMessage;
 	if (mApp->IsTrialStageLocked() && aSeedType >= SEED_SQUASH && aSeedType != SEED_TANGLEKELP)
@@ -292,8 +293,8 @@ void AwardScreen::DrawAwardSeed(Graphics* g)
 		aMessage = Plant::GetToolTip(aSeedType);
 	DrawBottom(g, "[NEW_PLANT]", aAward, aMessage);
 
-	g->SetScale(2, 2, 350, 129);
-	DrawSeedPacket(g, 350, 129, aSeedType, SEED_NONE, 0, 255, true, false);
+	g->SetScale(2, 2, 350 + 130, 129);
+	DrawSeedPacket(g, 350 + 130, 129, aSeedType, SEED_NONE, 0, 255, true, false);
 	g->SetScale(1, 1, 0, 0);
 }
 

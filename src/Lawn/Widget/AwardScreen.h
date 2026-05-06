@@ -68,7 +68,7 @@ public:
 
 	/*inline*/ bool		IsPaperNote();
 	virtual void		Resize(int theX, int theY, int theWidth, int theHeight) { Widget::Resize(theX, theY, theWidth, theHeight); }
-	static void			DrawBottom(Graphics* g, const std::string& theTitle, const std::string& theAward, const std::string& theMessage);
+	void				DrawBottom(Graphics* g, const std::string& theTitle, const std::string& theAward, const std::string& theMessage);
 	void				DrawAwardSeed(Graphics* g);
 	virtual void		Draw(Graphics* g);
 	virtual void		Update();
