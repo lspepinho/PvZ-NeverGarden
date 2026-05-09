@@ -535,7 +535,66 @@ bool PatchWidescreenPak(const std::filesystem::path& theResourceDir)
 		}
 	}
 
-	LogPrintf("[Widescreen] Replaced %d files, added %d new files", replaced, added);
+	LogPrintf("[Widescreen] Replaced %d files, added %d new files from ZIP", replaced, added);
+	
+	// Step 4.5: Overlay local assets
+	fs::path aLocalAssets = theResourceDir / "assets";
+	if (!fs::exists(aLocalAssets)) {
+		// Try relative to current working directory as fallback
+		aLocalAssets = fs::current_path() / "assets";
+	}
+
+	if (fs::exists(aLocalAssets))
+	{
+		LogPrintf("[Widescreen] Found local assets at: %s", aLocalAssets.string().c_str());
+		int localReplaced = 0, localAdded = 0;
+
+		for (auto& p : fs::recursive_directory_iterator(aLocalAssets))
+		{
+			if (!p.is_regular_file())
+				continue;
+
+			// We want to keep the "assets/" prefix in the PAK
+			fs::path relPath = fs::path("assets") / fs::relative(p.path(), aLocalAssets);
+			std::string relStr = relPath.generic_string();
+
+			// Read the file
+			std::ifstream fIn(p.path(), std::ios::binary | std::ios::ate);
+			if (!fIn)
+				continue;
+
+			size_t fSize = fIn.tellg();
+			fIn.seekg(0);
+			std::vector<uint8_t> fData(fSize);
+			fIn.read(reinterpret_cast<char*>(fData.data()), fSize);
+
+			// Check if this replaces an existing entry
+			std::string keyLower = relStr;
+			std::transform(keyLower.begin(), keyLower.end(), keyLower.begin(), ::tolower);
+
+			auto it = pakMap.find(keyLower);
+			if (it != pakMap.end())
+			{
+				pakEntries[it->second].data = std::move(fData);
+				localReplaced++;
+			}
+			else
+			{
+				PakEntry newEntry;
+				newEntry.name = relStr;
+				newEntry.fileTime = 0;
+				newEntry.data = std::move(fData);
+				pakMap[keyLower] = pakEntries.size();
+				pakEntries.push_back(std::move(newEntry));
+				localAdded++;
+			}
+		}
+		LogPrintf("[Widescreen] Local assets: Replaced %d files, added %d new files", localReplaced, localAdded);
+	}
+	else
+	{
+		LogPrintf("[Widescreen] Local assets directory not found at %s", aLocalAssets.string().c_str());
+	}
 
 	// Step 5: Repack
 	if (!RepackPak(aPakPath, pakEntries))

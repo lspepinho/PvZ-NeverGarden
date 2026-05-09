@@ -32,6 +32,7 @@ class ChallengeDefinition;
 class SeedChooserScreen;
 class AwardScreen;
 class CreditScreen;
+class LevelSelector;
 class TodFoley;
 class PoolEffect;
 class ZenGarden;
@@ -81,6 +82,7 @@ public:
 	AwardScreen*					mAwardScreen;
 	CreditScreen*					mCreditScreen;
 	ChallengeScreen*				mChallengeScreen;
+	LevelSelector*					mLevelSelector;
 	TodFoley*						mSoundSystem;
 	ButtonList						mControlButtonList;
 	ImageList						mCreatedImageList;
@@ -190,6 +192,8 @@ public:
 	void							KillAwardScreen();
 	void							ShowSeedChooserScreen();
 	void							KillSeedChooserScreen();
+	void							ShowLevelSelector();
+	void							KillLevelSelector();
 	void							DoHighScoreDialog();
 	void							DoBackToMain();
 	void							DoConfirmBackToMain();

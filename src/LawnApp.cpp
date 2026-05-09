@@ -60,6 +60,7 @@
 #include "Lawn/Widget/ChallengeScreen.h"
 #include "Lawn/Widget/NewOptionsDialog.h"
 #include "Lawn/Widget/SeedChooserScreen.h"
+#include "Lawn/Widget/LevelSelector.h"
 #include "widget/WidgetManager.h"
 #include "misc/ResourceManager.h"
 
@@ -157,6 +158,7 @@ LawnApp::LawnApp()
 	mTitle = aTitleName;
 	mCustomCursorsEnabled = false;
 	mPlayerInfo = nullptr;
+	mLevelSelector = nullptr;
 	mLastLevelStats = new LevelStats();
 	mFirstTimeGameSelector = true;
 	mGameMode = GameMode::GAMEMODE_ADVENTURE;
@@ -357,7 +359,7 @@ void LawnApp::KillBoard()
 		mBoard = nullptr;
 	}
 
-	SetCursor(CURSOR_POINTER);
+	SexyAppBase::SetCursor(CURSOR_POINTER);
 }
 
 bool LawnApp::CanPauseNow()
@@ -557,6 +559,33 @@ void LawnApp::KillGameSelector()
 		mWidgetManager->RemoveWidget(mGameSelector);
 		SafeDeleteWidget(mGameSelector);
 		mGameSelector = nullptr;
+	}
+}
+
+void LawnApp::ShowLevelSelector()
+{
+	KillGameSelector();
+	if (mLevelSelector)
+	{
+		mWidgetManager->RemoveWidget(mLevelSelector);
+		SafeDeleteWidget(mLevelSelector);
+	}
+
+	mGameScene = GameScenes::SCENE_LEVEL_SELECTION;
+	mLevelSelector = new LevelSelector(this);
+	mLevelSelector->Resize(0, 0, mWidth, mHeight);
+	mWidgetManager->AddWidget(mLevelSelector);
+	mWidgetManager->BringToBack(mLevelSelector);
+	mWidgetManager->SetFocus(mLevelSelector);
+}
+
+void LawnApp::KillLevelSelector()
+{
+	if (mLevelSelector)
+	{
+		mWidgetManager->RemoveWidget(mLevelSelector);
+		SafeDeleteWidget(mLevelSelector);
+		mLevelSelector = nullptr;
 	}
 }
 

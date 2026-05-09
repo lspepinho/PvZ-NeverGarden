@@ -1295,29 +1295,7 @@ void GameSelector::ClickedAdventure()
 	}
 
 	mApp->mMusic->StopAllMusic();
-	mApp->PlaySample(Sexy::SOUND_LOSEMUSIC);
-	mStartingGame = true;
-	mAdventureButton->SetDisabled(true);
-	mMinigameButton->SetDisabled(true);
-	mPuzzleButton->SetDisabled(true);
-	mOptionsButton->SetDisabled(true);
-	mQuitButton->SetDisabled(true);
-	mHelpButton->SetDisabled(true);
-	mChangeUserButton->SetDisabled(true);
-	mStoreButton->SetDisabled(true);
-	mAlmanacButton->SetDisabled(true);
-	mSurvivalButton->SetDisabled(true);
-	mZenGardenButton->SetDisabled(true);
-	mZombatarButton->SetDisabled(true); // @Patoke: added new widgets
-	mAchievementsButton->SetDisabled(true);
-
-	Reanimation* aHandReanim = mApp->AddReanimation(-70.0f, 10.0f, 0, ReanimationType::REANIM_ZOMBIE_HAND);
-	aHandReanim->mLoopType = ReanimLoopType::REANIM_PLAY_ONCE_AND_HOLD;
-	mHandReanimID = mApp->ReanimationGetID(aHandReanim);
-	mApp->PlayFoley(FoleyType::FOLEY_DIRT_RISE);
-	for (int i = 0; i < aHandReanim->mDefinition->mTracks.count; i++)
-		if (!strncasecmp(aHandReanim->mDefinition->mTracks.tracks[i].mName, "rock", 4))
-			aHandReanim->mTrackInstances[i].mIgnoreClipRect = true;
+	mApp->ShowLevelSelector();
 }
 
 // GOTY @Patoke: 0x44F590
