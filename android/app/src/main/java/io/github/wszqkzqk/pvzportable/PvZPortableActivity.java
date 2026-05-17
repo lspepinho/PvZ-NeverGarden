@@ -55,6 +55,8 @@ public class PvZPortableActivity extends SDLActivity {
             return;
         }
 
+        copyAssetsToExternal();
+
         super.onCreate(savedInstanceState);
         hideSystemUI();
 
@@ -127,6 +129,36 @@ public class PvZPortableActivity extends SDLActivity {
             requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE;
         }
         super.setRequestedOrientation(requestedOrientation);
+    }
+
+    private void copyAssetsToExternal() {
+        try {
+            File destDir = new File(getExternalFilesDir(null), "assets");
+            if (!destDir.exists() && !destDir.mkdirs()) {
+                Log.e(TAG, "Failed to create assets directory: " + destDir.getAbsolutePath());
+            }
+            String[] assetsList = getAssets().list("assets");
+            if (assetsList != null) {
+                for (String filename : assetsList) {
+                    if (filename.contains(".")) {
+                        java.io.InputStream in = getAssets().open("assets/" + filename);
+                        File outFile = new File(destDir, filename);
+                        java.io.OutputStream out = new java.io.FileOutputStream(outFile);
+                        byte[] buffer = new byte[8192];
+                        int read;
+                        while ((read = in.read(buffer)) != -1) {
+                            out.write(buffer, 0, read);
+                        }
+                        in.close();
+                        out.flush();
+                        out.close();
+                        Log.i(TAG, "Copied asset: " + filename + " to " + outFile.getAbsolutePath());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to copy assets", e);
+        }
     }
 
     private static boolean hasGameResources(File dir) {

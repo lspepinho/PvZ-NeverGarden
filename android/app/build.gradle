@@ -88,3 +88,10 @@ dependencies {
     implementation 'androidx.activity:activity:1.10.1'
     implementation 'androidx.documentfile:documentfile:1.0.1'
 }
+
+tasks.register('copyGameAssets', Copy) {
+    from "${project.rootDir}/../assets"
+    into "src/main/assets/assets"
+}
+
+preBuild.dependsOn copyGameAssets
