@@ -1345,6 +1345,11 @@ void Board::InitSurvivalStage()
 
 Rect Board::GetShovelButtonRect()
 {
+#if defined(__ANDROID__)
+	// Place the shovel next to the Sun bank (which is at x = 0, y = 0)
+	return Rect(83, 2, 70, 70);
+#endif
+
 	int aSeedBankWidth = 446 + GetSeedBankExtraWidth();
 	Rect aRect(GetSeedBankX() + aSeedBankWidth + 10, 0, 70, 70);
 	if (mApp->IsSlotMachineLevel() || mApp->IsSquirrelLevel())
@@ -9165,6 +9170,10 @@ int Board::GetSeedBankExtraWidth()
 
 int Board::GetSeedBankX()
 {
+#if defined(__ANDROID__)
+	return 0;
+#endif
+
     if (mApp->mGameMode == GameMode::GAMEMODE_CHALLENGE_ZEN_GARDEN || mApp->mGameMode == GameMode::GAMEMODE_TREE_OF_WISDOM)
         return gLawnOffset;
 

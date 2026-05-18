@@ -31,6 +31,7 @@
 #include "../System/Music.h"
 #include "../../Resources.h"
 #include "../../Lawn/Plant.h"
+#include "../../SexyAppFramework/graphics/Font.h"
 #include "../ToolTipWidget.h"
 #include "SeedChooserScreen.h"
 #include "../../GameConstants.h"
@@ -58,6 +59,8 @@ SeedChooserScreen::SeedChooserScreen()
 	mToolTip->mMaxLinesWidth = mApp->GetInteger("SEED_CHOOSER_SCREEN_TOOL_TIP_MAX_LINE_WIDTH", 0);
 	mToolTipSeed = -1;
 
+	int aOffsetX = PAD;
+
 	mStartButton = new GameButton(SeedChooserScreen::SeedChooserScreen_Start);
 	mStartButton->SetLabel("[LETS_ROCK_BUTTON]"); // @Patoke: wrong local name
 	mStartButton->mButtonImage = Sexy::IMAGE_SEEDCHOOSER_BUTTON;
@@ -66,7 +69,7 @@ SeedChooserScreen::SeedChooserScreen()
 	mStartButton->mDisabledImage = Sexy::IMAGE_SEEDCHOOSER_BUTTON_DISABLED;
 	mStartButton->mOverOverlayImage = Sexy::IMAGE_SEEDCHOOSER_BUTTON_GLOW;
 	mStartButton->SetFont(Sexy::FONT_DWARVENTODCRAFT18YELLOW);
-	mStartButton->Resize(154 + 2 * PAD + 129, 545, 156, 42);
+	mStartButton->Resize(154 + 129 + aOffsetX, 545, 156, 42);
 	mStartButton->mTextOffsetY = -1;
 	EnableStartButton(false);
 
@@ -83,7 +86,7 @@ SeedChooserScreen::SeedChooserScreen()
 	mRandomButton->SetFont(Sexy::FONT_BRIANNETOD12);
 	mRandomButton->mColors[0] = Color(255, 240, 0);
 	mRandomButton->mColors[1] = Color(200, 200, 255);
-	mRandomButton->Resize(332 + 2 * PAD + 129, 546, 100, 30);
+	mRandomButton->Resize(332 + 129 + aOffsetX, 546, 100, 30);
 	if (!mApp->mTodCheatKeys)
 	{
 		mRandomButton->mBtnNoDraw = true;
@@ -104,7 +107,7 @@ SeedChooserScreen::SeedChooserScreen()
 	mViewLawnButton->SetFont(Sexy::FONT_BRIANNETOD12);
 	mViewLawnButton->mColors[0] = aBtnColor;
 	mViewLawnButton->mColors[1] = aBtnColor;
-	mViewLawnButton->Resize(22 + 2 * PAD + 129, 561, aImageWidth, aImageHeight);
+	mViewLawnButton->Resize(22 + 129 + aOffsetX, 561, aImageWidth, aImageHeight);
 	mViewLawnButton->mParentWidget = this;
 	mViewLawnButton->mTextOffsetY = 1;
 	if (!mBoard->mCutScene->IsSurvivalRepick())
@@ -121,7 +124,7 @@ SeedChooserScreen::SeedChooserScreen()
 	mAlmanacButton->SetFont(Sexy::FONT_BRIANNETOD12);
 	mAlmanacButton->mColors[0] = aBtnColor;
 	mAlmanacButton->mColors[1] = aBtnColor;
-	mAlmanacButton->Resize(560 + 2 * PAD + 129, 572, aImageWidth, aImageHeight);
+	mAlmanacButton->Resize(560 + 129 + aOffsetX, 572, aImageWidth, aImageHeight);
 	mAlmanacButton->mParentWidget = this;
 	mAlmanacButton->mTextOffsetY = 1;
 
@@ -133,7 +136,7 @@ SeedChooserScreen::SeedChooserScreen()
 	mStoreButton->SetFont(Sexy::FONT_BRIANNETOD12);
 	mStoreButton->mColors[0] = aBtnColor;
 	mStoreButton->mColors[1] = aBtnColor;
-	mStoreButton->Resize(680 + 2 * PAD + 129, 572, aImageWidth, aImageHeight);
+	mStoreButton->Resize(680 + 129 + aOffsetX, 572, aImageWidth, aImageHeight);
 	mStoreButton->mParentWidget = this;
 	mStoreButton->mTextOffsetY = 1;
 
@@ -142,7 +145,7 @@ SeedChooserScreen::SeedChooserScreen()
 	mImitaterButton->mOverImage = Sexy::IMAGE_IMITATERSEED;
 	mImitaterButton->mDownImage = Sexy::IMAGE_IMITATERSEED;
 	mImitaterButton->mDisabledImage = Sexy::IMAGE_IMITATERSEEDDISABLED;
-	mImitaterButton->Resize(464 + 2 * PAD + 129, 515, Sexy::IMAGE_IMITATERSEED->mWidth, Sexy::IMAGE_IMITATERSEED->mHeight);
+	mImitaterButton->Resize(464 + 129 + aOffsetX, 515, Sexy::IMAGE_IMITATERSEED->mWidth, Sexy::IMAGE_IMITATERSEED->mHeight);
 	mImitaterButton->mParentWidget = this;
 
 	if (!mApp->CanShowAlmanac())
@@ -282,6 +285,8 @@ bool SeedChooserScreen::Has7Rows()
 
 void SeedChooserScreen::GetSeedPositionInChooser(int theIndex, int& x, int& y)
 {
+	int aOffsetX = PAD;
+
 	if (theIndex == SEED_IMITATER)
 	{
 		x = mImitaterButton->mX;
@@ -292,7 +297,7 @@ void SeedChooserScreen::GetSeedPositionInChooser(int theIndex, int& x, int& y)
 		int aRow = theIndex / 8;
 		int aCol = theIndex % 8;
 
-		x = aCol * 53 + 22 + PAD + 129;
+		x = aCol * 53 + 22 + 129 + aOffsetX;
 		if (NUM_SEEDS_IN_CHOOSER > 48)
 		{
 			y = aRow * 50 + 123;
@@ -310,8 +315,13 @@ void SeedChooserScreen::GetSeedPositionInChooser(int theIndex, int& x, int& y)
 
 void SeedChooserScreen::GetSeedPositionInBank(int theIndex, int& x, int& y)
 {
+#if defined(__ANDROID__)
+	x = mBoard->mSeedBank->mX - mX + mBoard->mSeedBank->mSeedPackets[theIndex].mX;
+	y = mBoard->mSeedBank->mY - mY + mBoard->mSeedBank->mSeedPackets[theIndex].mY;
+#else
 	x = mBoard->mSeedBank->mX - mX + mBoard->GetSeedPacketPositionX(theIndex);
 	y = mBoard->mSeedBank->mY - mY + 8;
+#endif
 }
 
 SeedChooserScreen::~SeedChooserScreen()
@@ -354,10 +364,12 @@ void SeedChooserScreen::Draw(Graphics* g)
 	if (!mBoard->ChooseSeedsOnCurrentLevel() || (mBoard->mCutScene && mBoard->mCutScene->IsBeforePreloading()))
 		return;
 
-	g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_BACKGROUND, PAD + 129, 87);
+	int aOffsetX = PAD;
+
+	g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_BACKGROUND, 129 + aOffsetX, 87);
 	if (mApp->HasSeedType(SEED_IMITATER))
 	{
-		g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_IMITATERADDON, 459 + PAD + 129, 503);
+		g->DrawImage(Sexy::IMAGE_SEEDCHOOSER_IMITATERADDON, 459 + 129 + aOffsetX, 503);
 	}
 	// @Patoke: wrong local name
 	TodDrawString(g, "[CHOOSE_YOUR_PLANTS]", 229 + PAD + 129, 110, Sexy::FONT_DWARVENTODCRAFT18YELLOW, Color::White, DS_ALIGN_CENTER);
@@ -393,7 +405,11 @@ void SeedChooserScreen::Draw(Graphics* g)
 		{
 			int x, y;
 			GetSeedPositionInBank(anIndex, x, y);
+#if defined(__ANDROID__)
+			DrawSeedPacket(g, x, y, SEED_NONE, SEED_NONE, 0, 255, false, false);
+#else
 			g->DrawImage(Sexy::IMAGE_SEEDPACKETSILHOUETTE, x, y);
+#endif
 		}
 	}
 
@@ -783,7 +799,16 @@ SeedType SeedChooserScreen::SeedHitTest(int x, int y)
 		{
 			ChosenSeed& aChosenSeed = mChosenSeeds[aSeedType];
 			if (!mApp->HasSeedType(aSeedType) || aChosenSeed.mSeedState == SEED_PACKET_HIDDEN) continue;
-			if (Rect(aChosenSeed.mX, aChosenSeed.mY, SEED_PACKET_WIDTH, SEED_PACKET_HEIGHT).Contains(x, y)) return aSeedType;
+			int aWidth = SEED_PACKET_WIDTH;
+			int aHeight = SEED_PACKET_HEIGHT;
+#if defined(__ANDROID__)
+			if (aChosenSeed.mSeedState == SEED_IN_BANK)
+			{
+				aWidth = 87;
+				aHeight = 55;
+			}
+#endif
+			if (Rect(aChosenSeed.mX, aChosenSeed.mY, aWidth, aHeight).Contains(x, y)) return aSeedType;
 		}
 	}
 	return SEED_NONE;

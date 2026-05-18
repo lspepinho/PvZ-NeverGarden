@@ -24,10 +24,12 @@
 #include "Challenge.h"
 #include "SeedPacket.h"
 #include "../LawnApp.h"
+#include "Widget/SeedChooserScreen.h"
 #include "CursorObject.h"
 #include "../Resources.h"
 #include "MessageWidget.h"
 #include "graphics/Font.h"
+#include "graphics/GLImage.h"
 #include "../Sexy.TodLib/FilterEffect.h"
 #include "misc/SexyMatrix.h"
 
@@ -279,9 +281,221 @@ void SeedPacketDrawSeed(Graphics* g, float x, float y, SeedType theSeedType, See
 	}
 }
 
+struct PacketRect {
+    int x;
+    int y;
+    int w;
+    int h;
+};
+
+bool GetAndroidPacketRect(SeedType theSeedType, PacketRect& theRect)
+{
+    switch (theSeedType)
+    {
+    case SEED_PEASHOOTER:       theRect = { 2, 3, 109, 69 }; return true;
+    case SEED_SUNFLOWER:        theRect = { 114, 3, 108, 69 }; return true;
+    case SEED_CHERRYBOMB:       theRect = { 225, 3, 108, 69 }; return true;
+    case SEED_WALLNUT:          theRect = { 335, 3, 109, 69 }; return true;
+    case SEED_POTATOMINE:       theRect = { 447, 3, 108, 69 }; return true;
+    case SEED_SNOWPEA:          theRect = { 558, 4, 108, 68 }; return true;
+    case SEED_CHOMPER:          theRect = { 669, 3, 108, 69 }; return true;
+    case SEED_REPEATER:         theRect = { 779, 3, 109, 69 }; return true;
+
+    case SEED_PUFFSHROOM:       theRect = { 3, 75, 108, 69 }; return true;
+    case SEED_SUNSHROOM:        theRect = { 113, 75, 109, 69 }; return true;
+    case SEED_FUMESHROOM:       theRect = { 224, 75, 109, 69 }; return true;
+    case SEED_GRAVEBUSTER:      theRect = { 335, 75, 109, 69 }; return true;
+    case SEED_HYPNOSHROOM:      theRect = { 447, 75, 108, 69 }; return true;
+    case SEED_SCAREDYSHROOM:    theRect = { 557, 76, 109, 68 }; return true;
+    case SEED_ICESHROOM:        theRect = { 668, 75, 109, 69 }; return true;
+    case SEED_DOOMSHROOM:       theRect = { 780, 75, 108, 69 }; return true;
+
+    case SEED_LILYPAD:          theRect = { 3, 147, 108, 69 }; return true;
+    case SEED_SQUASH:           theRect = { 114, 147, 108, 69 }; return true;
+    case SEED_THREEPEATER:      theRect = { 225, 147, 108, 69 }; return true;
+    case SEED_TANGLEKELP:       theRect = { 335, 147, 109, 69 }; return true;
+    case SEED_JALAPENO:         theRect = { 447, 147, 108, 69 }; return true;
+    case SEED_SPIKEWEED:        theRect = { 558, 147, 108, 69 }; return true;
+    case SEED_TORCHWOOD:        theRect = { 669, 148, 108, 68 }; return true;
+    case SEED_TALLNUT:          theRect = { 780, 147, 108, 69 }; return true;
+
+    case SEED_SEASHROOM:        theRect = { 3, 219, 108, 69 }; return true;
+    case SEED_PLANTERN:         theRect = { 113, 219, 109, 69 }; return true;
+    case SEED_CACTUS:           theRect = { 224, 219, 109, 69 }; return true;
+    case SEED_BLOVER:           theRect = { 335, 218, 109, 70 }; return true;
+    case SEED_SPLITPEA:         theRect = { 446, 218, 109, 70 }; return true;
+    case SEED_STARFRUIT:        theRect = { 557, 219, 109, 69 }; return true;
+    case SEED_PUMPKINSHELL:     theRect = { 668, 219, 109, 69 }; return true;
+    case SEED_MAGNETSHROOM:     theRect = { 779, 219, 109, 69 }; return true;
+
+    case SEED_CABBAGEPULT:      theRect = { 3, 290, 108, 70 }; return true;
+    case SEED_FLOWERPOT:        theRect = { 113, 291, 109, 69 }; return true;
+    case SEED_KERNELPULT:       theRect = { 224, 291, 109, 69 }; return true;
+    case SEED_INSTANT_COFFEE:   theRect = { 335, 294, 109, 66 }; return true;
+    case SEED_GARLIC:           theRect = { 447, 294, 108, 66 }; return true;
+    case SEED_UMBRELLA:         theRect = { 557, 291, 109, 69 }; return true;
+    case SEED_MARIGOLD:         theRect = { 668, 291, 109, 69 }; return true;
+    case SEED_MELONPULT:        theRect = { 779, 291, 109, 69 }; return true;
+
+    case SEED_GATLINGPEA:       theRect = { 3, 363, 108, 69 }; return true;
+    case SEED_TWINSUNFLOWER:    theRect = { 113, 363, 109, 69 }; return true;
+    case SEED_GLOOMSHROOM:      theRect = { 224, 363, 109, 69 }; return true;
+    case SEED_CATTAIL:          theRect = { 335, 364, 109, 68 }; return true;
+    case SEED_WINTERMELON:      theRect = { 447, 363, 108, 69 }; return true;
+    case SEED_GOLD_MAGNET:      theRect = { 557, 363, 109, 69 }; return true;
+    case SEED_SPIKEROCK:        theRect = { 668, 363, 109, 69 }; return true;
+    case SEED_COBCANNON:        theRect = { 779, 366, 109, 66 }; return true;
+
+    case SEED_IMITATER:         theRect = { 3, 435, 108, 69 }; return true;
+    case SEED_EXPLODE_O_NUT:    theRect = { 113, 435, 109, 69 }; return true;
+    case SEED_GIANT_WALLNUT:    theRect = { 224, 435, 109, 69 }; return true;
+    case SEED_SPROUT:           theRect = { 335, 437, 109, 67 }; return true;
+    case SEED_NONE:             theRect = { 446, 434, 106, 70 }; return true;
+
+    case SEED_BEGHOULED_BUTTON_SHUFFLE: theRect = { 668, 434, 109, 70 }; return true;
+    case SEED_BEGHOULED_BUTTON_CRATER:  theRect = { 558, 438, 108, 66 }; return true;
+    case SEED_SLOT_MACHINE_SUN:         theRect = { 779, 438, 109, 66 }; return true;
+    case SEED_SLOT_MACHINE_DIAMOND:     theRect = { 2, 510, 109, 66 }; return true;
+    case SEED_ZOMBIQUARIUM_SNORKLE:     theRect = { 114, 510, 108, 66 }; return true;
+    case SEED_ZOMBIQUARIUM_TROPHY:      theRect = { 224, 510, 109, 66 }; return true;
+    default: return false;
+    }
+}
+
 void DrawSeedPacket(Graphics* g, float x, float y, SeedType theSeedType, SeedType theImitaterType, float thePercentDark, int theGrayness, bool theDrawCost, bool theUseCurrentCost)
 {
+#if defined(__ANDROID__)
+	bool aUseMobileSprite = true;
+	if (gLawnApp->mSeedChooserScreen != nullptr)
+	{
+		SeedType aCheckSeed = theSeedType;
+		if (aCheckSeed == SeedType::SEED_IMITATER && theImitaterType != SeedType::SEED_NONE)
+		{
+			aCheckSeed = theImitaterType;
+		}
+		if (aCheckSeed != SeedType::SEED_NONE)
+		{
+			ChosenSeedState aState = gLawnApp->mSeedChooserScreen->mChosenSeeds[aCheckSeed].mSeedState;
+			if (aState == ChosenSeedState::SEED_IN_CHOOSER || theGrayness == 55)
+			{
+				aUseMobileSprite = false;
+			}
+		}
+	}
+	if (aUseMobileSprite)
+	{
+		SeedType aLookupType = theSeedType;
+		if (aLookupType == SeedType::SEED_IMITATER && theImitaterType != SeedType::SEED_NONE)
+		{
+			aLookupType = theImitaterType;
+		}
+
+		PacketRect rect;
+		if (GetAndroidPacketRect(aLookupType, rect))
+		{
+			static Image* gPacketsAndroidImage = nullptr;
+			if (gPacketsAndroidImage == nullptr)
+			{
+				gPacketsAndroidImage = gLawnApp->GetImage("assets/packets.png");
+			}
+
+			if (gPacketsAndroidImage != nullptr)
+			{
+				if (theSeedType == SeedType::SEED_IMITATER && theImitaterType != SeedType::SEED_NONE)
+				{
+					g->SetColor(Color(160, 160, 160, 255));
+					g->SetColorizeImages(true);
+				}
+				else if (theGrayness != 255)
+				{
+					g->SetColor(Color(theGrayness, theGrayness, theGrayness));
+					g->SetColorizeImages(true);
+				}
+				else if (thePercentDark > 0)
+				{
+					g->SetColor(Color(128, 128, 128, 255));
+					g->SetColorizeImages(true);
+				}
+
+				float aPackScale = 0.8f;
+				float aDrawWidth = rect.w * aPackScale * g->mScaleX;
+				float aDrawHeight = rect.h * aPackScale * g->mScaleY;
+
+				Rect aSrcRect(rect.x, rect.y, rect.w, rect.h);
+				Rect aDestRect(x, y, aDrawWidth, aDrawHeight);
+				g->DrawImage(gPacketsAndroidImage, aDestRect, aSrcRect);
+
+				if (thePercentDark > 0.0f)
+				{
+					int aDarknessHeight = FloatRoundToInt((rect.h - 2) * thePercentDark) + 2;
+					Graphics aPlantG(*g);
+					aPlantG.SetColor(Color(64, 64, 64, 255));
+					aPlantG.SetColorizeImages(true);
+					aPlantG.ClipRect(x, y, aDrawWidth, aDarknessHeight * aPackScale * g->mScaleY);
+					aPlantG.DrawImage(gPacketsAndroidImage, aDestRect, aSrcRect);
+				}
+
+				if (theDrawCost && theSeedType != SeedType::SEED_NONE)
+				{
+					int aCost = 0;
+					if (theUseCurrentCost && gLawnApp->mBoard != nullptr)
+					{
+						aCost = gLawnApp->mBoard->GetCurrentPlantCost(theSeedType, theImitaterType);
+					}
+					else
+					{
+						aCost = Plant::GetCost(theSeedType, theImitaterType);
+					}
+
+					// Disable colorization for the Green Curve bubble to keep it bright/opaque!
+					g->SetColorizeImages(false);
+
+					Rect aCurveSrc(393, 543, 43, 25);
+					Rect aCurveDest(x + 45 * g->mScaleX, y + 27 * g->mScaleY, 34 * g->mScaleX, 20 * g->mScaleY);
+					g->DrawImage(gPacketsAndroidImage, aCurveDest, aCurveSrc);
+
+					std::string aCostStr = StrFormat("%d", aCost);
+					Color aCostColor = Color::Black;
+					
+					// Draw with full opacity, ignoring theGrayness
+					if (gLawnApp->mBoard != nullptr && !gLawnApp->mBoard->CanTakeSunMoney(aCost) && theUseCurrentCost)
+					{
+						aCostColor = Color(255, 0, 0); // Fully bright red
+					}
+					else
+					{
+						aCostColor = Color(0, 0, 0); // Fully bright black
+					}
+
+					// Scale the FONT_PICO129 font up using matrix transformation
+					float aTargetScaleX = 1.45f * g->mScaleX;
+					float aTargetScaleY = 1.45f * g->mScaleY;
+					float aStrWidth = FONT_PICO129->StringWidth(aCostStr);
+					float aStrHeight = FONT_PICO129->GetAscent();
+
+					float aDrawX = x + 62 * g->mScaleX - (aStrWidth * 0.5f * aTargetScaleX) + g->mTransX;
+					float aDrawY = y + 27 * g->mScaleY + (20 * g->mScaleY + aStrHeight * aTargetScaleY) * 0.5f + g->mTransY;
+
+					SexyMatrix3 aMatrix;
+					TodScaleTransformMatrix(aMatrix, aDrawX, aDrawY, aTargetScaleX, aTargetScaleY);
+
+					if (g->mScaleX > 1.8f)
+					{
+						g->SetLinearBlend(false);
+					}
+					TodDrawStringMatrix(g, FONT_PICO129, aMatrix, aCostStr, aCostColor);
+					g->SetLinearBlend(true);
+				}
+
+				g->SetColorizeImages(false);
+				return;
+			}
+		}
+	}
+#endif
+
 	SeedType aSeedType = theSeedType;
+
 	if (aSeedType == SeedType::SEED_IMITATER && theImitaterType != SeedType::SEED_NONE)
 	{
 		aSeedType = theImitaterType;
@@ -940,6 +1154,10 @@ SeedBank::SeedBank()
 
 void SeedBank::Draw(Graphics* g)
 {
+#if defined(__ANDROID__)
+	UpdateWidth();
+#endif
+
 	if (mBoard->mCutScene && mBoard->mCutScene->IsBeforePreloading())
 	{
 		return;
@@ -951,6 +1169,22 @@ void SeedBank::Draw(Graphics* g)
 		g->mTransY -= mBoard->mY;
 	}
 
+#if defined(__ANDROID__)
+	if (mApp->IsSlotMachineLevel())
+	{
+		g->DrawImage(IMAGE_SUNBANK, 0, 0);
+	}
+	else if (mBoard->HasConveyorBeltSeedBank())
+	{
+		g->DrawImage(IMAGE_CONVEYORBELT_BACKDROP, 83, 0);
+		g->DrawImageCel(IMAGE_CONVEYORBELT, 90, 63, mConveyorBeltCounter / 4 % 6);
+		g->SetClipRect(90, 0, 501, BOARD_HEIGHT);
+	}
+	else
+	{
+		g->DrawImage(IMAGE_SUNBANK, 0, 0);
+	}
+#else
 	if (mApp->IsSlotMachineLevel())
 	{
 		g->DrawImage(IMAGE_SUNBANK, 0, 0);
@@ -968,6 +1202,7 @@ void SeedBank::Draw(Graphics* g)
 		g->DrawImage(IMAGE_SEEDBANK, 0, 0);
 		g->DrawImage(IMAGE_SEEDBANK, IMAGE_SEEDBANK->mWidth - 12, 0, theSrcRect);
 	}
+#endif
 
 	for (int i = 0; i < mNumPackets; i++)
 	{
@@ -980,10 +1215,23 @@ void SeedBank::Draw(Graphics* g)
 	}
 
 	g->ClearClipRect();
+#if !defined(__ANDROID__)
 	if (mApp->IsSlotMachineLevel() && mY > -IMAGE_SEEDBANK->GetHeight())
 	{
 		g->DrawImage(IMAGE_SLOTMACHINE_OVERLAY, 189, -2);
 	}
+#else
+	{
+		bool aInChooser = (mApp->mSeedChooserScreen != nullptr);
+		if (aInChooser)
+		{
+			if (mApp->IsSlotMachineLevel() && mY > -IMAGE_SEEDBANK->GetHeight())
+			{
+				g->DrawImage(IMAGE_SLOTMACHINE_OVERLAY, 189, -2);
+			}
+		}
+	}
+#endif
 
 	if (!mBoard->HasConveyorBeltSeedBank())
 	{
@@ -1177,11 +1425,28 @@ void SeedBank::UpdateConveyorBelt()
 void SeedBank::UpdateWidth()
 {
 	mNumPackets = mBoard->GetNumSeedsInBank();
+#if defined(__ANDROID__)
+	mWidth = 87;
+	mX = 0;
+	mHeight = 600;
+	for (int i = 0; i < mNumPackets; i++)
+	{
+		mSeedPackets[i].mX = 0;
+		mSeedPackets[i].mY = 87 + i * 56;
+		mSeedPackets[i].mWidth = 87;
+		mSeedPackets[i].mHeight = 55;
+	}
+	return;
+#endif
+
 	mWidth = 446 + mBoard->GetSeedBankExtraWidth();
     mX = mBoard->GetSeedBankX();
 	for (int i = 0; i < mNumPackets; i++)
 	{
 		mSeedPackets[i].mX = mBoard->GetSeedPacketPositionX(i);
+		mSeedPackets[i].mY = 8;
+		mSeedPackets[i].mWidth = 50;
+		mSeedPackets[i].mHeight = 70;
 	}
 }
 
