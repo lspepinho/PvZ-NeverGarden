@@ -366,7 +366,7 @@ void DrawSeedPacket(Graphics* g, float x, float y, SeedType theSeedType, SeedTyp
 {
 #if defined(__ANDROID__)
 	bool aUseMobileSprite = true;
-	if (gLawnApp->mAwardScreen != nullptr)
+	if (gLawnApp->mAwardScreen != nullptr || (gLawnApp->mGameScene == GameScenes::SCENE_PLAYING && !theUseCurrentCost))
 	{
 		aUseMobileSprite = false;
 	}
