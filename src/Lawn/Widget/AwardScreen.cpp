@@ -173,7 +173,7 @@ AwardScreen::AwardScreen(LawnApp* theApp, AwardType theAwardType, bool theShowin
 	mMenuButton->mColors[ButtonWidget::COLOR_LABEL] = Color(42, 42, 90);
 	mMenuButton->mColors[ButtonWidget::COLOR_LABEL_HILITE] = Color(42, 42, 90);
 	mMenuButton->mParentWidget = this;
-	mMenuButton->Resize(677, 16, 111, 26);
+	mMenuButton->Resize(677 + 2 * PAD, 16, 111, 26);
 	mMenuButton->mTextOffsetY = 1;
 	if (!mApp->HasFinishedAdventure() && aLevel <= 3)
 	{

@@ -28,6 +28,7 @@
 #include "../Sexy.TodLib/TodCommon.h"
 #include "../Sexy.TodLib/Reanimator.h"
 #include "../Sexy.TodLib/TodStringFile.h"
+#include "../GameConstants.h"
 
 //(0x4081F1)
 MessageWidget::MessageWidget(LawnApp* theApp)
@@ -271,7 +272,7 @@ void MessageWidget::DrawReanimatedText(Graphics* g, _Font* theFont, const Color&
 		Color aFinalColor(theColor);
 		aFinalColor.mAlpha = anAlpha;
 
-		aTransform.mTransX += aTextReanim->mOverlayMatrix.m02;
+		aTransform.mTransX += aTextReanim->mOverlayMatrix.m02 + gLawnOffset;
 		aTransform.mTransY += aTextReanim->mOverlayMatrix.m12 + thePosY - BOARD_HEIGHT / 2;
 		if (mReanimType == ReanimationType::REANIM_TEXT_FADE_ON && mDisplayTime - mDuration < mSlideOffTime)
 		{

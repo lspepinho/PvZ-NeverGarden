@@ -366,7 +366,11 @@ void DrawSeedPacket(Graphics* g, float x, float y, SeedType theSeedType, SeedTyp
 {
 #if defined(__ANDROID__)
 	bool aUseMobileSprite = true;
-	if (gLawnApp->mSeedChooserScreen != nullptr)
+	if (gLawnApp->mAwardScreen != nullptr)
+	{
+		aUseMobileSprite = false;
+	}
+	else if (gLawnApp->mSeedChooserScreen != nullptr)
 	{
 		SeedType aCheckSeed = theSeedType;
 		if (aCheckSeed == SeedType::SEED_IMITATER && theImitaterType != SeedType::SEED_NONE)

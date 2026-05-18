@@ -6206,7 +6206,9 @@ void Board::DrawBackdrop(Graphics* g)
 	}
 	if (StageHasPool())
 	{
+		g->Translate(gLawnOffset, 0);
 		mApp->mPoolEffect->PoolEffectDraw(g, StageIsNight());
+		g->Translate(-gLawnOffset, 0);
 	}
 	if (mTutorialState == TutorialState::TUTORIAL_LEVEL_1_PLANT_PEASHOOTER)
 	{
@@ -6934,7 +6936,7 @@ void Board::DrawProgressMeter(Graphics* g)
 	{
 		int aNumWavesPerFlag = GetNumWavesPerFlag();
 		int aNumFlagWaves = mNumWaves / aNumWavesPerFlag;
-		int aFlagsPosEnd = 590 + aCelWidth;  // 旗帜区域的右界横坐标
+		int aFlagsPosEnd = 590 + aCelWidth + 2 * PAD;  // 旗帜区域的右界横坐标
 		for (int aFlagWave = 1; aFlagWave <= aNumFlagWaves; aFlagWave++)
 		{
 			// 取得旗帜升起时的高度偏移
@@ -6949,7 +6951,7 @@ void Board::DrawProgressMeter(Graphics* g)
 				aHeight = TodAnimateCurve(100, 0, mFlagRaiseCounter, 0, 14, TodCurves::CURVE_LINEAR);
 			}
 			// 计算旗帜的横坐标
-			int aPosX = TodAnimateCurve(0, mNumWaves, aTotalWavesAtFlag, aFlagsPosEnd, 606, TodCurves::CURVE_LINEAR);
+			int aPosX = TodAnimateCurve(0, mNumWaves, aTotalWavesAtFlag, aFlagsPosEnd, 606 + 2 * PAD, TodCurves::CURVE_LINEAR);
 			// 绘制旗杆
 			g->DrawImageCel(Sexy::IMAGE_FLAGMETERPARTS, aPosX, 571, 1, 0);
 			// 绘制旗帜
