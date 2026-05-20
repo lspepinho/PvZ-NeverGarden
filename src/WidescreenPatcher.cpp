@@ -1,4 +1,6 @@
 #include "WidescreenPatcher.h"
+#if !defined(__SWITCH__) && !defined(__3DS__) && !defined(__IPHONEOS__)
+
 #include "SexyAppFramework/Common.h"
 
 #include <cstdio>
@@ -12,7 +14,11 @@
 #include <algorithm>
 #include <cstdarg>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/fetch.h>
+#else
 #include <curl/curl.h>
+#endif
 #include <minizip/unzip.h>
 #include <SDL.h>
 
@@ -88,6 +94,7 @@ static std::string GetBaseName(const std::string& path)
 	return (pos == std::string::npos) ? path : path.substr(pos + 1);
 }
 
+#ifndef __EMSCRIPTEN__
 // libcurl write callback
 static size_t CurlWriteCallback(void* ptr, size_t size, size_t nmemb, void* userdata)
 {
@@ -97,6 +104,7 @@ static size_t CurlWriteCallback(void* ptr, size_t size, size_t nmemb, void* user
 	vec->insert(vec->end(), bytes, bytes + total);
 	return total;
 }
+#endif
 
 // ============================================================================
 // Download
@@ -106,6 +114,41 @@ static bool DownloadFile(const char* url, const fs::path& outPath)
 {
 	LogPrintf("[Widescreen] Downloading %s ...", url);
 
+#ifdef __EMSCRIPTEN__
+	emscripten_fetch_attr_t attr;
+	emscripten_fetch_attr_init(&attr);
+	strcpy(attr.requestMethod, "GET");
+	attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY | EMSCRIPTEN_FETCH_SYNCHRONOUS;
+	
+	emscripten_fetch_t *fetch = emscripten_fetch(&attr, url);
+	if (!fetch)
+	{
+		LogPrintf("[Widescreen] emscripten_fetch failed to start");
+		return false;
+	}
+
+	if (fetch->status != 200)
+	{
+		LogPrintf("[Widescreen] HTTP error: %d", fetch->status);
+		emscripten_fetch_close(fetch);
+		return false;
+	}
+
+	LogPrintf("[Widescreen] Downloaded %llu bytes", fetch->numBytes);
+
+	fs::create_directories(outPath.parent_path());
+	std::ofstream ofs(outPath, std::ios::binary);
+	if (!ofs)
+	{
+		LogPrintf("[Widescreen] Failed to write %s", outPath.string().c_str());
+		emscripten_fetch_close(fetch);
+		return false;
+	}
+	ofs.write(fetch->data, fetch->numBytes);
+	emscripten_fetch_close(fetch);
+	return true;
+
+#else
 	CURL* curl = curl_easy_init();
 	if (!curl)
 	{
@@ -154,6 +197,7 @@ static bool DownloadFile(const char* url, const fs::path& outPath)
 	}
 	ofs.write(reinterpret_cast<const char*>(data.data()), data.size());
 	return true;
+#endif
 }
 
 // ============================================================================
@@ -403,7 +447,9 @@ static bool RepackPak(const fs::path& pakPath, const std::vector<PakEntry>& entr
 bool PatchWidescreenPak(const std::filesystem::path& theResourceDir)
 {
     try {
+#ifndef __EMSCRIPTEN__
         curl_global_init(CURL_GLOBAL_DEFAULT);
+#endif
         fs::path aSaveDir;
         std::string aAppData = Sexy::GetAppDataFolder();
         if (!aAppData.empty())
@@ -621,3 +667,12 @@ bool PatchWidescreenPak(const std::filesystem::path& theResourceDir)
         return false;
     }
 }
+
+#else
+
+bool PatchWidescreenPak(const std::filesystem::path& theResourceDir)
+{
+	return true;
+}
+
+#endif

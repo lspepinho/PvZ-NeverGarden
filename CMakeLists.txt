@@ -83,6 +83,48 @@ elseif(EMSCRIPTEN)
 	find_library(OPENMPT_LIBRARY NAMES openmpt libopenmpt REQUIRED)
 	set(OPENMPT_LIB ${OPENMPT_LIBRARY})
 
+	# Emscripten doesn't have a port for minizip, so we compile it from source
+	# inspired by the build_minizip_emscripten.sh script
+	include(FetchContent)
+	FetchContent_Declare(
+		minizip
+		URL https://github.com/nmoinvaz/minizip/archive/2.8.8.tar.gz
+	)
+	FetchContent_GetProperties(minizip)
+	if(NOT minizip_POPULATED)
+		FetchContent_Populate(minizip)
+		add_library(minizip STATIC
+			${minizip_SOURCE_DIR}/mz_crypt.c
+			${minizip_SOURCE_DIR}/mz_os.c
+			${minizip_SOURCE_DIR}/mz_strm.c
+			${minizip_SOURCE_DIR}/mz_strm_buf.c
+			${minizip_SOURCE_DIR}/mz_strm_mem.c
+			${minizip_SOURCE_DIR}/mz_strm_split.c
+			${minizip_SOURCE_DIR}/mz_zip.c
+			${minizip_SOURCE_DIR}/mz_zip_rw.c
+			${minizip_SOURCE_DIR}/mz_os_posix.c
+			${minizip_SOURCE_DIR}/mz_strm_os_posix.c
+			${minizip_SOURCE_DIR}/mz_strm_zlib.c
+			${minizip_SOURCE_DIR}/mz_compat.c
+		)
+		target_compile_definitions(minizip PUBLIC
+			HAVE_INTTYPES_H=1
+			HAVE_STDINT_H=1
+			HAVE_ZLIB=1
+			MZ_ZIP_NO_COMPRESSION=1
+			MZ_ZIP_NO_ENCRYPTION=1
+			MZ_COMPAT=1
+			MZ_COMPAT_VERSION=288
+		)
+		target_compile_options(minizip PRIVATE -Os)
+		target_include_directories(minizip PUBLIC ${minizip_SOURCE_DIR})
+		
+		# Provide a dummy unzip.h that includes mz_compat.h to satisfy <minizip/unzip.h>
+		file(MAKE_DIRECTORY "${minizip_SOURCE_DIR}/minizip")
+		file(WRITE "${minizip_SOURCE_DIR}/minizip/unzip.h" "#include \"../mz_compat.h\"\n")
+	endif()
+	set(MINIZIP_LIB minizip)
+
 	list(APPEND SOURCES
 		${CMAKE_CURRENT_SOURCE_DIR}/src/SexyAppFramework/platform/emscripten/Window.cpp
 		${CMAKE_CURRENT_SOURCE_DIR}/src/SexyAppFramework/platform/default/Input.cpp
@@ -314,6 +356,7 @@ if(EMSCRIPTEN)
 		"SHELL:-sUSE_VORBIS=1"
 		"SHELL:-sUSE_MPG123=1"
 		"SHELL:-sASYNCIFY"
+		"SHELL:-sFETCH=1"
 		"SHELL:-sALLOW_MEMORY_GROWTH=1"
 		"SHELL:-sMAXIMUM_MEMORY=1073741824"
 		"SHELL:-sFORCE_FILESYSTEM=1"
